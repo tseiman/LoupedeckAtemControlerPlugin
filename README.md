@@ -1,13 +1,22 @@
 # LoupedeckAtemControlerPlugin
 A plugin for Loupedeck (CT) whcih connects directly to a Blackmagic ATEM Mini (Pro, Iso, ...) and is inteded to
-run some basic operations.
+run some basic operations:
 
+- Set Still Image
+- execute Macro
 
 ## Build
-TBD
+This is a visual studio project and can be build with it.
+Packing the plugin: TBD
+
+## Installation
+currently the packing doesn't work - I'm copying the entire folder /bin/Debug/* folder to
+`/Users/USERNAME/Library/Application Support/Logi/LogiPluginService/Plugins/LoupedeckAtemControlerPlugin/mac/`
+The content of `metadata` folder has to go to 
+`/Users/USERNAME/Library/Application Support/Logi/LogiPluginService/Plugins/LoupedeckAtemControlerPlugin/metadata/`
 
 ## Configuration
-TBD
+TBD (to be implemented)
 
 
 
@@ -20,3 +29,7 @@ This loads from the `still_images` folder all JPEG images and displays those in 
 through the images.
 From the commands you can assign the command "Set Still Image" to a button - likely the press button function of the dial makes the most sense.
 The idea is that you can select a still image for the ATEM and can upload it to the ATEM with a button press.
+
+
+# Execute Macro
+TBD (to be implemented)
