@@ -3,7 +3,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.Helpers
 {
     public class StillImageData
     {
-        public string ImagePath  { get; set; } = "";
+        public String ImagePath { get; set; } = "";
     }
 
 }

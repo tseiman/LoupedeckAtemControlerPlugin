@@ -15,6 +15,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
                : base(displayName: "Set Still Image", description: "Uploads the currently selected Image to the ATEM mini", groupName: "Commands")
            {
                this._stillImageData = stillImageData;
+            
            }
         /*   
         public SetStillImageCommand()
