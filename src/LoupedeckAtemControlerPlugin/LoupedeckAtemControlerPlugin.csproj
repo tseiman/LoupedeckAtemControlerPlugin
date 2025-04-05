@@ -40,6 +40,12 @@
   </ItemGroup>
   
   
+  <ItemGroup>
+    <None Remove="ATEM\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="ATEM\" />
+  </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Condition="$(OS) == 'Windows_NT'" Command="echo $(OutputPath) &gt; &quot;$(PluginDir)$(ProjectName).link&quot;" />
     <Exec Condition="$(OS) != 'Windows_NT'" Command="echo $(OutputPath) &gt; $(PluginDir)$(ProjectName).link" />

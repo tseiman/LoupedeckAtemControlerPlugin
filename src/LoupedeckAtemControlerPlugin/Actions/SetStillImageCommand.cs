@@ -7,14 +7,13 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
     // This class implements an example command that counts button presses.
     public class SetStillImageCommand : PluginDynamicCommand
     {
-        protected StillImageData _stillImageData;
+        private LoupedeckAtemControlerPlugin _plugin => (LoupedeckAtemControlerPlugin)this.Plugin;
 
 
         // Initializes the command class.
-           public SetStillImageCommand(StillImageData stillImageData)
+        public SetStillImageCommand()
                : base(displayName: "Set Still Image", description: "Uploads the currently selected Image to the ATEM mini", groupName: "Commands")
            {
-               this._stillImageData = stillImageData;
             
            }
         /*   
@@ -26,7 +25,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
               */
 
 
-        public void StillImageData(StillImageData stillImageData) => this._stillImageData = stillImageData;
+      
 
         // This method is called when the user executes the command.
         protected override void RunCommand(String actionParameter)
@@ -34,9 +33,10 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
             //      this._counter++;
             //    this.ActionImageChanged(); // Notify the plugin service that the command display name and/or image has changed.
             //   PluginLog.Info($">>>> Sending Image !!! {this._stillImageData.ImagePath}"); // Write the current counter value to the log file.
-            if (this._stillImageData != null)
+            if (this._plugin.stillImageData != null)
             {
-                PluginLog.Info($">>>> Sending Image !!! {this._stillImageData.ImagePath}");
+                // PluginLog.Info($">>>> Sending Image !!! {this._plugin.stillImageData.ImagePath}");
+                this._plugin.atemControlInterface.setStillImage(this._plugin.stillImageData.AtemURI, this._plugin.stillImageData.ImagePath);
             }
             else
             {

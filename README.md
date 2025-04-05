@@ -21,12 +21,11 @@ TBD (to be implemented)
 
 
 ## Set Still image
-Create in the user folder of Loupedeck a plugin data directory e.g. under MacOS:
-`/Users/USERNAME/Library/Application Support/Logi/LogiPluginService/PluginData/LoupedeckAtemControlerPlugin/still_images`
-which contains various JPEG images in a size (e.g. 2k HD 1920x1080).
-In the Loupdeck configuration GUI you can now assign the "Still Image Select" adjustment to a dial.
-This loads from the `still_images` folder all JPEG images and displays those in the small LCD. You can now scroll with hte dial
-through the images.
+You need a folder where to sore the still images for the ATEM still function and which contains various JPEG images in a size (e.g. 2k HD 1920x1080).
+In the Loupdeck configuration GUI you can now assign the "Still Image Select" adjustment to a dial - this has as well a configuration "Enter Folder to find JPEG Images" -
+place here the (absolute) path to the folder with the still images.
+Now on turning the dial it loads from the folder all JPEG images and displays those in the small LCD. You can now scroll with the dial
+through the images. If content in the folder is changed it will automatically update the list which can be selected by the dial.
 From the commands you can assign the command "Set Still Image" to a button - likely the press button function of the dial makes the most sense.
 The idea is that you can select a still image for the ATEM and can upload it to the ATEM with a button press.
 

@@ -4,50 +4,66 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
 
     using System.IO;
-    using System.Xml.Linq;
 
     using Loupedeck.LoupedeckAtemControlerPlugin.Helpers;
 
-    using SkiaSharp;
+    using Loupedeck.Devices.Loupedeck2Devices;
 
 
-   
-   public class ImageScrollAdjustment : PluginDynamicAdjustment
+    public class ImageScrollAdjustment : PluginDynamicAdjustment
     {
         private String[] _imageFiles = Array.Empty<String>();
         private Int32 _currentIndex = 0;
-        private String _imageFolder;
+   //     private String _imageFolder;
 
-        protected StillImageData _stillImageData;
 
         private FileSystemWatcher _fsWatcher;
 
-        public ImageScrollAdjustment(StillImageData stillImageData)
-               : base(displayName: "Still Image Select", description: "scrolls through the still images in the still_image folder", groupName: "Adjustments", hasReset: false)
-        {
-            this.MakeProfileAction("text;Enter Folder to find JPEG Images:");
-            this._stillImageData = stillImageData;
 
+        private LoupedeckAtemControlerPlugin _plugin => (LoupedeckAtemControlerPlugin)this.Plugin;
+
+        public ImageScrollAdjustment()
+               : base(false)
+        {
+            base.GroupName = "Adjustments";
+            base.DisplayName = "Still Image Select";
+            base.Description = "scrolls through the still images in the still_image folder";
+
+            this.MakeProfileAction("text;Enter Folder to find JPEG Images:");
         }
 
         protected override Boolean OnLoad()
         {
-            this._imageFolder = null; 
+            if (!this._plugin.stillImageData.ImagePath.Equals(""))
+            {
+                this.SetupFsWatcher();
+                this.OnChanged(null, null);
+                this.Log.Info($"[ImageScroll] Loading images from stored config path");
+                this.ActionImageChanged();
+            }
+                  
+
+
+                    // this._plugin.stillImageData.ImagePath = null;
+
+
             return true;
         }
 
 
-        private void OnChanged(Object source, FileSystemEventArgs e) {
-            this._imageFiles = Directory.GetFiles(this._imageFolder, "*.jpg").Union(Directory.GetFiles(this._imageFolder, "*.jpeg")).ToArray();
-            this.Log.Info($"[ImageScroll] Found {this._imageFiles.Length} images in {this._imageFolder}");
+        private void OnChanged(Object source, FileSystemEventArgs e)
+        {
+            this._imageFiles = Directory.GetFiles(this._plugin.stillImageData.ImagePath, "*.jpg").Union(Directory.GetFiles(this._plugin.stillImageData.ImagePath, "*.jpeg")).ToArray();
+            this.Log.Info($"[ImageScroll] Found {this._imageFiles.Length} images in {this._plugin.stillImageData.ImagePath}");
 
         }
 
 
-        private void setupFsWatcher() {
+        private void SetupFsWatcher()
+        {
 
             this._fsWatcher = new FileSystemWatcher();
-            this._fsWatcher.Path = this._imageFolder;
+            this._fsWatcher.Path = this._plugin.stillImageData.ImagePath;
             this._fsWatcher.NotifyFilter = NotifyFilters.Attributes
                                  | NotifyFilters.CreationTime
                                  | NotifyFilters.DirectoryName
@@ -78,51 +94,52 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
         {
 
 
-            if (this._imageFolder == null)
+            if (this._plugin.stillImageData.ImagePath == null || (!this._plugin.stillImageData.ImagePath.Equals(actionParameter)))
             {
-                this._imageFolder = actionParameter;
-                this.setupFsWatcher();
+                this._fsWatcher?.Dispose();
+                                
+                this._plugin.stillImageData.ImagePath = actionParameter;
+                this.SetupFsWatcher();
+                this.OnChanged(null, null);
             }
             else
             {
-                this._imageFolder = actionParameter;
+                this._plugin.stillImageData.ImagePath = actionParameter;
             }
-
-
 
             if (this._imageFiles.Length == 0)
             {
                 return;
             }
-       
+
 
             this._currentIndex += diff;
 
-            // Wrap-around
+
             if (this._currentIndex >= this._imageFiles.Length)
             {
-                this._currentIndex = 0;
+                this._currentIndex = this._imageFiles.Length;
             }
 
 
             if (this._currentIndex < 0)
             {
-                this._currentIndex = this._imageFiles.Length - 1;
+                this._currentIndex = 0;
             }
-            
+
 
             this.Log.Info($"[ImageScroll] ApplyAdjustment → index: {this._currentIndex}, actionParam: {actionParameter}");
 
-            if (this._stillImageData != null)
+            if (this._plugin.stillImageData != null)
             {
-                this._stillImageData.ImagePath = this._imageFiles[this._currentIndex];
+                this._plugin.stillImageData.ImagePath = this._imageFiles[this._currentIndex];
             }
 
             this.ActionImageChanged();
-            
+
         }
 
-        
+
         protected override String GetAdjustmentDisplayName(String actionParameter, PluginImageSize imageSize)
         {
 
@@ -147,28 +164,26 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
                 ? $"{this._currentIndex + 1}/{this._imageFiles.Length}"
                 : "0/0";
         }
-        
 
 
 
- 
+
+
         protected override BitmapImage GetAdjustmentImage(String actionParameter, PluginImageSize imageSize)
         {
-
-
             var path = this._imageFiles[this._currentIndex];
 
-
-            return BitmapImage.FromFile(path);
-
-
+            using (var bitmapBuilder = new BitmapBuilder(imageSize))
+            {
+                bitmapBuilder.SetBackgroundImage(BitmapImage.FromFile(path));
+                return bitmapBuilder.ToImage();
+            }
          
         }
-        
 
-       
-       
+
+
     }
 
- 
+
 }
