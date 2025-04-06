@@ -19,6 +19,9 @@
     <PluginDir Condition="$(OS) != 'Windows_NT'">~/Library/Application\ Support/Logi/LogiPluginService/Plugins/</PluginDir>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <OutputPath>..\..\bin\Debug\mac</OutputPath>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="PluginApi">
       <HintPath>$(PluginApiDir)PluginApi.dll</HintPath>
@@ -36,7 +39,9 @@
   </Reference>
     
     <PackageReference Include="System.Drawing.Common" Version="9.0.3" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="LibAtem" Version="1.0.0" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.7" />
   </ItemGroup>
   
   
@@ -47,15 +52,17 @@
     <Folder Include="ATEM\" />
   </ItemGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Condition="$(OS) == 'Windows_NT'" Command="echo $(OutputPath) &gt; &quot;$(PluginDir)$(ProjectName).link&quot;" />
-    <Exec Condition="$(OS) != 'Windows_NT'" Command="echo $(OutputPath) &gt; $(PluginDir)$(ProjectName).link" />
+    <Exec Condition="$(OS) == 'Windows_NT'" Command="echo $(MSBuildProjectDirectory)/$(OutputPath).. &gt; &quot;$(PluginDir)$(ProjectName).link&quot;" />
+    <Exec Condition="$(OS) != 'Windows_NT'" Command="echo $(MSBuildProjectDirectory)/$(OutputPath).. &gt; $(PluginDir)$(ProjectName).link" />
   </Target>
+
+
 
   <Target Name="CopyMetadata" AfterTargets="PostBuildEvent">
     <ItemGroup>
       <MetadataFiles Include="metadata\*.*" />
     </ItemGroup>
-    <Copy SourceFiles="@(MetadataFiles)" DestinationFolder="$(OutputPath)metadata" />
+    <Copy SourceFiles="@(MetadataFiles)" DestinationFolder="$(OutputPath)/../metadata" />
   </Target>
 
   <Target Name="PluginClean" AfterTargets="CoreClean">

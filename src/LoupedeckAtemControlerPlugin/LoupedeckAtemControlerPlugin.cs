@@ -19,7 +19,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
         public readonly StillImageData stillImageData;// = new(this.Plugin);
 
-        public readonly AtemControlInterface atemControlInterface;
+        public AtemControlInterface atemControlInterface;
 
 
         // Initializes a new instance of the plugin class.
@@ -32,8 +32,6 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
             PluginResources.Init(this.Assembly);
 
             this.stillImageData = new StillImageData(this);
-            this.atemControlInterface = new AtemControlInterface(this.stillImageData);
-
 
         }
 
@@ -43,14 +41,26 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
         // This method is called when the plugin is loaded.
         public override void Load()
         {
-     //       Environment.SetEnvironmentVariable("DOTNET_SYSTEM_DRAWING_ENABLE_UNIX_SUPPORT", "1", EnvironmentVariableTarget.Process);
-  //          this.AddDynamicAction(new ImageScrollAdjustment(this._stillImageData));
-   //        this.AddDynamicAction(new SetStillImageCommand(this._stillImageData));
+            //       Environment.SetEnvironmentVariable("DOTNET_SYSTEM_DRAWING_ENABLE_UNIX_SUPPORT", "1", EnvironmentVariableTarget.Process);
+                      
+                    // this.AddDynamicAction(new SetStillImageCommand(ata));
+
+            this.stillImageData.LoadData();
+
+            this.AddDynamicAction(new ImageScrollAdjustment(true));
+
+            this.atemControlInterface = new AtemControlInterface(this.stillImageData);
+
 
         }
 
         // This method is called when the plugin is unloaded.
-        public override void Unload() => this.stillImageData.Dispose();
+        public override void Unload()
+        {
+            this.atemControlInterface.Dispose();
+            this.stillImageData.Save();
+
+        }
 
 
 

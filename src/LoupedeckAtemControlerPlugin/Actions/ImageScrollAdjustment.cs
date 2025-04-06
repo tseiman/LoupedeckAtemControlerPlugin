@@ -22,7 +22,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
         private LoupedeckAtemControlerPlugin _plugin => (LoupedeckAtemControlerPlugin)this.Plugin;
 
-        public ImageScrollAdjustment()
+        public ImageScrollAdjustment(Boolean dummy)
                : base(false)
         {
             base.GroupName = "Adjustments";
@@ -34,17 +34,25 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
         protected override Boolean OnLoad()
         {
+
+
+
+            PluginLog.Verbose($"[ImageScroll] Initializing ...");
+
+
             if (!this._plugin.stillImageData.ImagePath.Equals(""))
             {
+
                 this.SetupFsWatcher();
                 this.OnChanged(null, null);
-                this.Log.Info($"[ImageScroll] Loading images from stored config path");
+                PluginLog.Verbose($"[ImageScroll] Loading images from stored config path {this._plugin.stillImageData.ImagePath}");
                 this.ActionImageChanged();
             }
-                  
+
+           
 
 
-                    // this._plugin.stillImageData.ImagePath = null;
+            // this._plugin.stillImageData.ImagePath = null;
 
 
             return true;
@@ -54,13 +62,16 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
         private void OnChanged(Object source, FileSystemEventArgs e)
         {
             this._imageFiles = Directory.GetFiles(this._plugin.stillImageData.ImagePath, "*.jpg").Union(Directory.GetFiles(this._plugin.stillImageData.ImagePath, "*.jpeg")).ToArray();
-            this.Log.Info($"[ImageScroll] Found {this._imageFiles.Length} images in {this._plugin.stillImageData.ImagePath}");
+            PluginLog.Verbose($"[ImageScroll] Found {this._imageFiles.Length} images in {this._plugin.stillImageData.ImagePath}");
 
         }
 
 
         private void SetupFsWatcher()
         {
+
+            PluginLog.Verbose($"[ImageScroll] Setting up new FSWatcher s {String.Join(", ", this._plugin.ListPluginSettings())}");
+
 
             this._fsWatcher = new FileSystemWatcher();
             this._fsWatcher.Path = this._plugin.stillImageData.ImagePath;
@@ -92,21 +103,27 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
         protected override void ApplyAdjustment(String actionParameter, Int32 diff)
         {
+        //    PluginLog.Verbose($"[ImageScroll] >>>>>>>>> PLUGIn Settings {String.Join(", ", this._plugin.ListPluginSettings())}");
 
-
-            if (this._plugin.stillImageData.ImagePath == null || (!this._plugin.stillImageData.ImagePath.Equals(actionParameter)))
+            if (!this._plugin.stillImageData.ImagePath.Equals(actionParameter) || this._imageFiles == null || this._imageFiles.Length == 0)
             {
+
+                PluginLog.Verbose($"[ImageScroll]  ImagePath not equal actionParam setting with with {actionParameter}");
+
                 this._fsWatcher?.Dispose();
                                 
                 this._plugin.stillImageData.ImagePath = actionParameter;
                 this.SetupFsWatcher();
                 this.OnChanged(null, null);
+                this._plugin.stillImageData.Save();
             }
-            else
+           /* else
             {
+                PluginLog.Info($"[ImageScroll]  overwrite ImagePath  with {actionParameter}");
                 this._plugin.stillImageData.ImagePath = actionParameter;
+                this._plugin.stillImageData.Save();
             }
-
+           */
             if (this._imageFiles.Length == 0)
             {
                 return;
@@ -128,11 +145,14 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
             }
 
 
-            this.Log.Info($"[ImageScroll] ApplyAdjustment → index: {this._currentIndex}, actionParam: {actionParameter}");
+            PluginLog.Info($"[ImageScroll] ApplyAdjustment → index: {this._currentIndex}, actionParam: {actionParameter}");
 
             if (this._plugin.stillImageData != null)
             {
-                this._plugin.stillImageData.ImagePath = this._imageFiles[this._currentIndex];
+                this._plugin.stillImageData.ActualFullImagePath = this._imageFiles[this._currentIndex];
+
+        //        this._plugin.stillImageData.ImagePath = actionParameter;
+
             }
 
             this.ActionImageChanged();
@@ -148,7 +168,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
             if (!File.Exists(path))
             {
-                this.Log.Warning($"Image file not found: {path}");
+                PluginLog.Warning($"Image file not found: {path}");
                 return "Img not Found";
             }
 

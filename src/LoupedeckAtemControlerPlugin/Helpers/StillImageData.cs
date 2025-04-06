@@ -8,8 +8,9 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.Helpers
 
 
 
-        private String ImagePath { get; set; }  = "";
-        private String AtemURI { get; set; } = "";
+        public String ImagePath { get; set; }  = "";
+        public String ActualFullImagePath { get; set; } = "";
+        public String AtemURI { get; set; } = "";
 
 
         private readonly Plugin _plugin;
@@ -19,6 +20,9 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.Helpers
         {
             this._plugin = plugin;
 
+        }
+
+        public void LoadData() {
             PluginLog.Info($"[StillImageData] Loading data for StillImage");
 
             if (this._plugin.TryGetPluginSetting("AtemURI", out var atemURI))
@@ -42,11 +46,23 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.Helpers
                 PluginLog.Warning($"[StillImageData] NOT Loading config ImagePath");
             }
 
+
+            if (this._plugin.TryGetPluginSetting("ActualFullImagePath", out var actualFullImagePath))
+            {
+                this.ActualFullImagePath = actualFullImagePath;
+                PluginLog.Info($"[StillImageData] Loading config ImagePath: <{actualFullImagePath}>");
+            }
+            else
+            {
+                PluginLog.Warning($"[StillImageData] NOT Loading config ActualFullImagePath");
+            }
+
+
         }
 
 
 
-        public void Dispose()
+        public void Save()
         {
 
             if (!this.AtemURI.Equals(""))
@@ -61,6 +77,14 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.Helpers
                 this._plugin.SetPluginSetting("ImagePath", this.ImagePath, false);
                 PluginLog.Info($"[StillImageData] Storing config ImagePath: <{this.ImagePath}>");
             }
+       
+
+            if (!this.ActualFullImagePath.Equals(""))
+            {
+                this._plugin.SetPluginSetting("ActualFullImagePath", this.ActualFullImagePath, false);
+                PluginLog.Info($"[StillImageData] Storing config ActualFullImagePath: <{this.ActualFullImagePath}>");
+            }
+
         }
 
 

@@ -21,6 +21,9 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
             this._plugin.SetPluginSetting("AtemURI", actionParameter, false);
             this._plugin.stillImageData.AtemURI = actionParameter;
 
+            this._plugin.stillImageData.Save();
+
+          //  this._plugin.atemControlInterface.Reconnect();
         }
 
     }

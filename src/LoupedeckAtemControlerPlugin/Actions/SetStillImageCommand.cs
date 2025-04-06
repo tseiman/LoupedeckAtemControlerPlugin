@@ -36,13 +36,29 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
             if (this._plugin.stillImageData != null)
             {
                 // PluginLog.Info($">>>> Sending Image !!! {this._plugin.stillImageData.ImagePath}");
-                this._plugin.atemControlInterface.setStillImage(this._plugin.stillImageData.AtemURI, this._plugin.stillImageData.ImagePath);
+               
+
+                Task.Run(async () =>
+                {
+                    try
+                    {
+                        await this._plugin.atemControlInterface.setStillImageAsync(this._plugin.stillImageData.ActualFullImagePath);
+
+                    }
+                    catch (Exception e)
+                    {
+                        PluginLog.Warning($"[SetStillImageCommand] ERROR when sendign image {e} ");
+                    }
+                });
+
+
             }
             else
             {
                 PluginLog.Warning($"ERROR Not possible to send image "); // Write the current counter value to the log file.
             }
-            
+
+
         }
 
         // This method is called when Loupedeck needs to show the command on the console or the UI.
