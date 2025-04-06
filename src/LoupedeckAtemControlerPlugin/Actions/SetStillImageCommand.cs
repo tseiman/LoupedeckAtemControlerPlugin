@@ -1,49 +1,62 @@
 namespace Loupedeck.LoupedeckAtemControlerPlugin
 {
     using System;
+    using log4net.Plugin;
 
-    using Loupedeck.LoupedeckAtemControlerPlugin.Helpers;
+    using Loupedeck.LoupedeckAtemControlerPlugin.ATEM;
 
     // This class implements an example command that counts button presses.
     public class SetStillImageCommand : PluginDynamicCommand
     {
         private LoupedeckAtemControlerPlugin _plugin => (LoupedeckAtemControlerPlugin)this.Plugin;
 
+        private  AtemCommandUploadStill _atemCommandUploadStill;
+        private AtemCommandSetStillMedia _atemCommandSetStillMedia;
+
+        private const UInt32 MEDIA_SLOT = 19;
+
 
         // Initializes the command class.
         public SetStillImageCommand()
                : base(displayName: "Set Still Image", description: "Uploads the currently selected Image to the ATEM mini", groupName: "Commands")
-           {
-            
-           }
-        /*   
-        public SetStillImageCommand()
-            : base(displayName: "Set Still Image", description: "Uploads the currently selected Image to the ATEM mini", groupName: "Commands")
         {
-            
+
+            LoupedeckAtemControlerPlugin.PluginReady += this.OnPluginReady;
         }
-              */
+
+        private void OnPluginReady()
+        {
+            // Now it's safe to initialize anything plugin-dependent
+            PluginLog.Warning($"[SetStillImageCommand] OnPluginReady");
+
+            this._atemCommandUploadStill = new();
+            this._plugin.initAtemCommand(this._atemCommandUploadStill);
 
 
-      
+            this._atemCommandSetStillMedia = new();
+            this._plugin.initAtemCommand(this._atemCommandSetStillMedia);
+
+
+        }
+
+
+
+
+
+
 
         // This method is called when the user executes the command.
         protected override void RunCommand(String actionParameter)
         {
-            //      this._counter++;
-            //    this.ActionImageChanged(); // Notify the plugin service that the command display name and/or image has changed.
-            //   PluginLog.Info($">>>> Sending Image !!! {this._stillImageData.ImagePath}"); // Write the current counter value to the log file.
+
             if (this._plugin.stillImageData != null)
             {
-                // PluginLog.Info($">>>> Sending Image !!! {this._plugin.stillImageData.ImagePath}");
-               
 
                 Task.Run(async () =>
                 {
                     try
                     {
-                        await this._plugin.atemControlInterface.setStillImageAsync(this._plugin.stillImageData.ActualFullImagePath);
-
+                        await this._atemCommandUploadStill.SetStillImageAsync(this._plugin.stillImageData.ActualFullImagePath, MEDIA_SLOT);
                     }
                     catch (Exception e)
                     {
@@ -58,6 +71,8 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
                 PluginLog.Warning($"ERROR Not possible to send image "); // Write the current counter value to the log file.
             }
 
+
+            this._atemCommandSetStillMedia.SetStillImageMediaToPlayer(MEDIA_SLOT);
 
         }
 

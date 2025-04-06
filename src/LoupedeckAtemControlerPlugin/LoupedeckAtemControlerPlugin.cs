@@ -21,6 +21,8 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
         public AtemControlInterface atemControlInterface;
 
+        public static event Action PluginReady;
+
 
         // Initializes a new instance of the plugin class.
         public LoupedeckAtemControlerPlugin()
@@ -46,11 +48,11 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
                     // this.AddDynamicAction(new SetStillImageCommand(ata));
 
             this.stillImageData.LoadData();
-
-            this.AddDynamicAction(new ImageScrollAdjustment(true));
-
             this.atemControlInterface = new AtemControlInterface(this.stillImageData);
 
+         //   this.AddDynamicAction(new ImageScrollAdjustment(true));
+
+            PluginReady?.Invoke();
 
         }
 
@@ -62,6 +64,20 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
         }
 
+
+        public Object initAtemCommand(IAtemCommand command) {
+
+            PluginLog.Verbose($"[LoupedeckAtemControlerPlugin] initialize ATEM command {command.GetType()}");
+
+            if (this.atemControlInterface == null)
+            {
+                PluginLog.Error($"[LoupedeckAtemControlerPlugin] AtemControlInterface not initialized !");
+                return null;
+            }
+
+            command.setAtemClient(this.atemControlInterface);
+            return command;
+        }
 
 
 

@@ -22,20 +22,24 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
         private LoupedeckAtemControlerPlugin _plugin => (LoupedeckAtemControlerPlugin)this.Plugin;
 
-        public ImageScrollAdjustment(Boolean dummy)
+        public ImageScrollAdjustment()
                : base(false)
         {
             base.GroupName = "Adjustments";
             base.DisplayName = "Still Image Select";
             base.Description = "scrolls through the still images in the still_image folder";
 
+            LoupedeckAtemControlerPlugin.PluginReady += this.OnPluginReady;
+
             this.MakeProfileAction("text;Enter Folder to find JPEG Images:");
         }
 
-        protected override Boolean OnLoad()
+
+
+
+        private void OnPluginReady()
         {
-
-
+            PluginLog.Verbose($"[ImageScrollAdjustment] OnPluginReady");
 
             PluginLog.Verbose($"[ImageScroll] Initializing ...");
 
@@ -46,17 +50,14 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
                 this.SetupFsWatcher();
                 this.OnChanged(null, null);
                 PluginLog.Verbose($"[ImageScroll] Loading images from stored config path {this._plugin.stillImageData.ImagePath}");
+                this._plugin.stillImageData.ActualFullImagePath = this._imageFiles[this._currentIndex];
                 this.ActionImageChanged();
             }
 
-           
 
 
-            // this._plugin.stillImageData.ImagePath = null;
-
-
-            return true;
         }
+
 
 
         private void OnChanged(Object source, FileSystemEventArgs e)
