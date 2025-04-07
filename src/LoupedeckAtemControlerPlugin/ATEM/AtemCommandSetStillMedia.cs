@@ -17,14 +17,6 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.ATEM
 
             PluginLog.Verbose($"[AtemCommandSetStillMedia] setStillImageMediaToPlayer");
 
-            var mpss = new MediaPlayerSourceSetCommand
-            {
-                Mask = MediaPlayerSourceSetCommand.MaskFlags.SourceType,
-                Index = 0,
-                SourceType = MediaPlayerSource.Still,
-            };
-            // this._atemClient.SendCommand(mpss);
-
             this._atemControlInterface.SendCommand(new MediaPlayerSourceSetCommand { Mask = MediaPlayerSourceSetCommand.MaskFlags.StillIndex, Index = (MediaPlayerId)0, StillIndex = slot });
 
         }

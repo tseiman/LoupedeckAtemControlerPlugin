@@ -104,6 +104,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.ATEM
             try
             {
                 this.AtemClient.SendCommand(command);
+                
             }
             catch (Exception e)
             {
