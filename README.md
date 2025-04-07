@@ -30,8 +30,8 @@ through the images. If content in the folder is changed it will automatically up
 From the commands you can assign the command "Set Still Image" to a button - likely the press button function of the dial makes the most sense.
 The idea is that you can select a still image for the ATEM and can upload it to the ATEM with a button press.
 
-# Execute Macro
+## Execute Macro
 TBD (to be implemented)
 
-# Toggle preview transition 
+## Toggle preview transition 
 Just place the Command "Toggle Preview Transition" on the Loupedeck
