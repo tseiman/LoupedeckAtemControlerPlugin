@@ -15,6 +15,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.ATEM
     // using SixLabors.ImageSharp.PixelFormats;
     using SixLabors.ImageSharp.Processing;
     using LibAtem.Net;
+    using LibAtem.Commands;
 
     public class AtemCommandUploadStill : IAtemCommand
     {
@@ -68,13 +69,13 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.ATEM
                 var job = new UploadMediaStillJob(stillId, frame,
                     (success) =>
                     {
-                        PluginLog.Verbose($"[AtemControlInterface] Still upload {stillId} completed with {success}");
+                        PluginLog.Verbose($"[AtemCommandUploadStill] Still upload {stillId} completed with {success}");
                         completion.SetResult(success);
                         // new MediaPlayerSourceSetCommand { Mask = MediaPlayerSourceSetCommand.MaskFlags.StillIndex, Index = (MediaPlayerId)PlayerIndex, StillIndex = StillIndex }
 
                     });
 
-                PluginLog.Warning($"[AtemControlInterface] Still upload {stillId} queued");
+                PluginLog.Warning($"[AtemCommandUploadStill] Still upload {stillId} queued");
 
 
 
@@ -90,15 +91,21 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.ATEM
             }
             catch (Exception e)
             {
-                PluginLog.Warning($"[AtemControlInterface] ERROR talking to ATEM {e}");
+                PluginLog.Warning($"[AtemCommandUploadStill] ERROR talking to ATEM {e}");
                 return false;
             }
             return true;
         }
 
-        public void setAtemClient(AtemControlInterface atemControlInterface) => this._atemControlInterface = atemControlInterface;
+        public void SetAtemClient(AtemControlInterface atemControlInterface) => this._atemControlInterface = atemControlInterface;
 
 
+        public void ReceiveCommand(Object sender, ICommand command)
+        {
+            PluginLog.Verbose($"[AtemCommandUploadStill] received command {command.GetType().Name}");
+        }
+
+        public void OnConnect() { }
     }
 }
 

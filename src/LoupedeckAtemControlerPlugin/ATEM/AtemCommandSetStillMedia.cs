@@ -2,7 +2,7 @@
 
 namespace Loupedeck.LoupedeckAtemControlerPlugin.ATEM
 {
-
+    using LibAtem.Commands;
     using LibAtem.Commands.Media;
     using LibAtem.Common;
 
@@ -23,6 +23,13 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.ATEM
 
 
         public void setAtemClient(AtemControlInterface atemControlInterface) => this._atemControlInterface = atemControlInterface;
+
+        public void ReceiveCommand(Object sender, ICommand command) {
+            PluginLog.Verbose($"[AtemCommandSetStillMedia] received command {command.GetType().Name}");
+        }
+
+        public void SetAtemClient(AtemControlInterface atemControlInterface) { }
+        public void OnConnect() { }
     }
 }
 

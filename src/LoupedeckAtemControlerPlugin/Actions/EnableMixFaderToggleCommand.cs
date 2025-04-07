@@ -6,65 +6,45 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
     using Loupedeck.LoupedeckAtemControlerPlugin.ATEM;
 
     // This class implements an example command that counts button presses.
-    public class TransitionPreviewToggleCommand : PluginMultistateDynamicCommand
+    public class EnableMixFaderToggleCommand : PluginMultistateDynamicCommand
     {
-        private AtemCommandTogglePreview _atemCommandTogglePreview;
 
         private LoupedeckAtemControlerPlugin _plugin => (LoupedeckAtemControlerPlugin)this.Plugin;
 
-       
+
 
         // Initializes the command class.
-        public TransitionPreviewToggleCommand()
-               : base(displayName: "Toggle Preview Transition", description: "The transition can be previewed in ATEM preview screen", groupName: "Commands")
+        public EnableMixFaderToggleCommand()
+               : base(displayName: "Enable Mix Fader", description: "This enables a knob as Fader with the Mix Fader Adjustment", groupName: "Commands")
         {
 
             LoupedeckAtemControlerPlugin.PluginReady += this.OnPluginReady;
 
-            this.AddState("ON", "Preview Transition ON", "Preview Transition ON");
-            this.AddState("OFF", "Preview Transition OFF", "Preview Transition OFF");
+            this.AddState("ON", "Mix Fader ON", "Mix Fader ON");
+            this.AddState("OFF", "Mix Fader OFF", "Mix Fader OFF");
         }
 
 
         private void OnPluginReady()
         {
-            this._atemCommandTogglePreview = new(this.MyGetToggleEvent);
-            this._plugin.initAtemCommand(this._atemCommandTogglePreview);
-           // this._atemCommandTogglePreview.TogglePreview(false); // HACK - please implement a way how to get state
         }
-
-
-        public void MyGetToggleEvent(Boolean state)
-        {
-            if (state)
-            { this.SetCurrentState(0); } else
-            { this.SetCurrentState(1); }
-            
-        }
-
-
 
 
         // This method is called when the user executes the command.
         protected override void RunCommand(String actionParameter)
         {
+            PluginLog.Verbose($"[EnableMixFaderToggleCommand] ToggleCurrentState {this.GetCurrentState().Name}");
             this.ToggleCurrentState();
-            PluginLog.Verbose($"[TransitionPreviewToggleCommand] ToggleCurrentState {this.GetCurrentState().Name}");
-
-            this._atemCommandTogglePreview.TogglePreview(this.GetCurrentState().Name.Equals("ON"));
-
-            
 
         }
 
 
         protected override BitmapImage GetCommandImage(String actionParameter, Int32 stateIndex, PluginImageSize imageSize) {
 
-           
+
 
             using (var bitmapBuilder = new BitmapBuilder(imageSize))
             {
-                //  bitmapBuilder.SetBackgroundImage(EmbeddedResources.ReadImage("MyPlugin.EmbeddedResources.MyImage.png"));
 
                 if (this.GetCurrentState().Name.Equals("ON"))
                 {
@@ -74,7 +54,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
                 {
                     bitmapBuilder.FillRectangle(0, 0, imageSize.GetButtonWidth(), imageSize.GetButtonHeight(), BitmapColor.Black);
                 }
-                    
+
                 bitmapBuilder.DrawText(this.GetCurrentState().DisplayName);
 
                 return bitmapBuilder.ToImage();
@@ -84,9 +64,10 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
 
         // This method is called when Loupedeck needs to show the command on the console or the UI.
-            protected override String GetCommandDisplayName(String actionParameter, PluginImageSize imageSize) =>
-                $"";
-
+        protected override String GetCommandDisplayName(String actionParameter, PluginImageSize imageSize)
+        {
+            return this.GetCurrentState().DisplayName;
+        }
         
     }
 }
