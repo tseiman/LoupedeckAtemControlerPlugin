@@ -65,6 +65,9 @@
     <Copy SourceFiles="@(MetadataFiles)" DestinationFolder="$(OutputPath)/../metadata" />
   </Target>
 
+
+
+
   <Target Name="PluginClean" AfterTargets="CoreClean">
     <Delete Condition="$(OS) == 'Windows_NT'" Files="$(PluginDir)$(ProjectName).link" />
     <Exec Condition="$(OS) != 'Windows_NT'" Command="rm -f $(PluginDir)$(ProjectName).link" />
