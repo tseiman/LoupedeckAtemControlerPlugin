@@ -9,26 +9,25 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.ATEM
     public class AtemCommandSetStillMedia : IAtemCommand
     {
 
-        private AtemControlInterface _atemControlInterface;
-
 
         public void SetStillImageMediaToPlayer(UInt32 slot)
         {
 
             PluginLog.Verbose($"[AtemCommandSetStillMedia] setStillImageMediaToPlayer");
 
-            this._atemControlInterface.SendCommand(new MediaPlayerSourceSetCommand { Mask = MediaPlayerSourceSetCommand.MaskFlags.StillIndex, Index = (MediaPlayerId)0, StillIndex = slot });
+            var atemControlInterface  = (AtemControlInterface) ServiceDirectory.Get(ServiceDirectory.T_AtemControlInterface);
+            atemControlInterface.SendCommand(new MediaPlayerSourceSetCommand { Mask = MediaPlayerSourceSetCommand.MaskFlags.StillIndex, Index = (MediaPlayerId)0, StillIndex = slot });
 
         }
 
 
-        public void setAtemClient(AtemControlInterface atemControlInterface) => this._atemControlInterface = atemControlInterface;
+     //   public void setAtemClient(AtemControlInterface atemControlInterface) => this._atemControlInterface = atemControlInterface;
 
         public void ReceiveCommand(Object sender, ICommand command) {
             PluginLog.Verbose($"[AtemCommandSetStillMedia] received command {command.GetType().Name}");
         }
 
-        public void SetAtemClient(AtemControlInterface atemControlInterface) { }
+        
         public void OnConnect() { }
     }
 }

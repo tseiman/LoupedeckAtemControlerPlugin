@@ -20,21 +20,18 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.ATEM
     public class AtemCommandUploadStill : IAtemCommand
     {
 
-        private AtemControlInterface _atemControlInterface;
-
-
-
-
-
+       
         public async Task<Boolean> SetStillImageAsync(String fileName, UInt32 stillId)
         {
 
 
-
             PluginLog.Verbose($"[AtemCommandUploadStill] Loading filename to ATEM media Slot {fileName}");
 
+            var atemControlInterface = (AtemControlInterface)ServiceDirectory.Get(ServiceDirectory.T_AtemControlInterface);
 
-            if (this._atemControlInterface == null)
+
+
+            if (atemControlInterface == null)
             {
                 PluginLog.Error($"[AtemCommandUploadStill] error ATEM controller Interface not initialized");
                 return false;
@@ -80,7 +77,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.ATEM
 
 
 
-                this._atemControlInterface.QueueDataTransferJob(job);
+                atemControlInterface.QueueDataTransferJob(job);
 
                 // Wait for the upload before returning
                 await completion.Task;
@@ -96,8 +93,6 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.ATEM
             }
             return true;
         }
-
-        public void SetAtemClient(AtemControlInterface atemControlInterface) => this._atemControlInterface = atemControlInterface;
 
 
         public void ReceiveCommand(Object sender, ICommand command)

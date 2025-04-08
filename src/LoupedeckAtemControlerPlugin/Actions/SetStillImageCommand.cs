@@ -4,6 +4,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
     using log4net.Plugin;
 
     using Loupedeck.LoupedeckAtemControlerPlugin.ATEM;
+    using Loupedeck.LoupedeckAtemControlerPlugin.Helpers;
 
     // This class implements an example command that counts button presses.
     public class SetStillImageCommand : PluginDynamicCommand
@@ -18,23 +19,27 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
         // Initializes the command class.
         public SetStillImageCommand()
-               : base(displayName: "Set Still Image", description: "Uploads the currently selected Image to the ATEM mini", groupName: "Commands")
+               : base(groupName: "Still Image Selection", displayName: "Set Still Image", description: "Uploads the currently selected Image to the ATEM mini")
         {
-
+       //     this.IsWidget = true;
             LoupedeckAtemControlerPlugin.PluginReady += this.OnPluginReady;
         }
 
         private void OnPluginReady()
         {
             // Now it's safe to initialize anything plugin-dependent
+
             PluginLog.Warning($"[SetStillImageCommand] OnPluginReady");
 
+            var atemControlInterface = (AtemControlInterface)ServiceDirectory.Get(ServiceDirectory.T_AtemControlInterface);
+
+
             this._atemCommandUploadStill = new();
-            this._plugin.initAtemCommand(this._atemCommandUploadStill);
+           // this._plugin.initAtemCommand(this._atemCommandUploadStill);
 
 
             this._atemCommandSetStillMedia = new();
-            this._plugin.initAtemCommand(this._atemCommandSetStillMedia);
+           // this._plugin.initAtemCommand(this._atemCommandSetStillMedia);
 
 
         }
@@ -48,15 +53,16 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
         // This method is called when the user executes the command.
         protected override void RunCommand(String actionParameter)
         {
+            var stillImageData = (StillImageData)ServiceDirectory.Get(ServiceDirectory.T_StillImageData);
 
-            if (this._plugin.stillImageData != null)
+            if (stillImageData != null)
             {
 
                 Task.Run(async () =>
                 {
                     try
                     {
-                        await this._atemCommandUploadStill.SetStillImageAsync(this._plugin.stillImageData.ActualFullImagePath, MEDIA_SLOT);
+                        await this._atemCommandUploadStill.SetStillImageAsync(stillImageData.ActualFullImagePath, MEDIA_SLOT);
                     }
                     catch (Exception e)
                     {

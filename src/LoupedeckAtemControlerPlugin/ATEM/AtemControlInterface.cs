@@ -104,13 +104,11 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.ATEM
 
             foreach (var cmd in commands)
             {
-                if (cmd is TimeCodeCommand or CameraControlGetCommand or DataTransferCompleteCommand or MacroPropertiesGetCommand)
+            /*    if (! (cmd is TimeCodeCommand or CameraControlGetCommand or DataTransferCompleteCommand or MacroPropertiesGetCommand))
                 {
-                    continue;
+                    PluginLog.Verbose($"[AtemControlInterface] Received Command {cmd.GetType().Name}");
                 }
-
-                PluginLog.Verbose($"[AtemControlInterface] Received Command {cmd.GetType().Name}");
-
+            */
 
                 if (! this._receiveCommandSubscribers.ContainsKey(cmd.GetType()))
                 {
@@ -180,7 +178,9 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.ATEM
             return true;
         }
 
-
+        /*
+         * this lets a IAtemCommand implementing class register to an incomming ATEM event
+         * */
         public void RegisterStateChangeListener(IAtemCommand atemCommand, List<Type> commands) {
 
             foreach (var cmd in commands)

@@ -2,15 +2,15 @@
 {
     using LibAtem.Commands;
     using LibAtem.Commands.MixEffects.Transition;
-    using LibAtem.Net;
+
 
     public interface IAtemCommand
     {
 
-        public static readonly Type TransitionPreviewGetCommand = typeof(TransitionPreviewGetCommand);
+        public static readonly Type T_TransitionPreviewGetCommand = typeof(TransitionPreviewGetCommand);
+        public static readonly Type T_TimeCodeCommand = typeof(TimeCodeCommand);
 
 
-        public void SetAtemClient(AtemControlInterface atemControlInterface);
         public void ReceiveCommand(Object sender, ICommand command);
         public void OnConnect();
     }

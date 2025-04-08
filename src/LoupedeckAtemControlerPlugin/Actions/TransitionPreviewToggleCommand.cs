@@ -4,11 +4,13 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
     using log4net.Plugin;
 
     using Loupedeck.LoupedeckAtemControlerPlugin.ATEM;
+    using Loupedeck.LoupedeckAtemControlerPlugin.Helpers;
 
     // This class implements an example command that counts button presses.
-    public class TransitionPreviewToggleCommand : PluginMultistateDynamicCommand
+    public class TransitionPreviewToggleCommand : PluginMultistateDynamicCommand, IBlinkenLightsReceiver
     {
         private AtemCommandTogglePreview _atemCommandTogglePreview;
+        private Boolean _blinkState;
 
         private LoupedeckAtemControlerPlugin _plugin => (LoupedeckAtemControlerPlugin)this.Plugin;
 
@@ -16,8 +18,9 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
         // Initializes the command class.
         public TransitionPreviewToggleCommand()
-               : base(displayName: "Toggle Preview Transition", description: "The transition can be previewed in ATEM preview screen", groupName: "Commands")
+               : base(groupName: "Misc", displayName: "Toggle Preview Transition", description: "The transition can be previewed in ATEM preview screen")
         {
+            this.IsWidget = true;
 
             LoupedeckAtemControlerPlugin.PluginReady += this.OnPluginReady;
 
@@ -28,13 +31,14 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
         private void OnPluginReady()
         {
-            this._atemCommandTogglePreview = new(this.MyGetToggleEvent);
-            this._plugin.initAtemCommand(this._atemCommandTogglePreview);
-           // this._atemCommandTogglePreview.TogglePreview(false); // HACK - please implement a way how to get state
+            this._atemCommandTogglePreview = new(this.GetToggleEvent);
+
+            ((BlinkenLightsTimeSource)ServiceDirectory.Get(ServiceDirectory.T_BlinkenLightsTimeSource)).RegisterBlinkenLightReceiver(this);
+
         }
 
 
-        public void MyGetToggleEvent(Boolean state)
+        private void GetToggleEvent(Boolean state)
         {
             if (state)
             { this.SetCurrentState(0); } else
@@ -64,17 +68,16 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
             using (var bitmapBuilder = new BitmapBuilder(imageSize))
             {
-                //  bitmapBuilder.SetBackgroundImage(EmbeddedResources.ReadImage("MyPlugin.EmbeddedResources.MyImage.png"));
 
-                if (this.GetCurrentState().Name.Equals("ON"))
+                if (this.GetCurrentState().Name.Equals("ON") && this._blinkState)
                 {
-                    bitmapBuilder.FillRectangle(0, 0, imageSize.GetButtonWidth(), imageSize.GetButtonHeight(), BitmapColor.Red);
+                    bitmapBuilder.FillRectangle(0, 0, imageSize.GetWidth(), imageSize.GetHeight(), BitmapColor.Red);
                 }
                 else
                 {
-                    bitmapBuilder.FillRectangle(0, 0, imageSize.GetButtonWidth(), imageSize.GetButtonHeight(), BitmapColor.Black);
+                    bitmapBuilder.FillRectangle(0, 0, imageSize.GetWidth(), imageSize.GetHeight(), BitmapColor.Black);
                 }
-                    
+
                 bitmapBuilder.DrawText(this.GetCurrentState().DisplayName);
 
                 return bitmapBuilder.ToImage();
@@ -83,10 +86,21 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
         }
 
 
-        // This method is called when Loupedeck needs to show the command on the console or the UI.
-            protected override String GetCommandDisplayName(String actionParameter, PluginImageSize imageSize) =>
-                $"";
+        protected override String GetCommandDisplayName(String actionParameter, PluginImageSize imageSize)
+        {
+            return this.GetCurrentState().DisplayName; 
 
-        
+        }
+        protected override String GetCommandDisplayName(String actionParameter, Int32 stateIndex, PluginImageSize imageSize) => this.GetCommandDisplayName(actionParameter, imageSize);
+
+
+
+        public void ReceiveTimeThick(Boolean blinkState)
+        {
+            this._blinkState = blinkState;
+
+            this.ActionImageChanged();
+        }
+
     }
 }

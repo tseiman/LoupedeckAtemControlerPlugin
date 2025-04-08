@@ -17,11 +17,19 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
         public override Boolean HasNoApplication => true;
 
 
-        public readonly StillImageData stillImageData;// = new(this.Plugin);
+        // public readonly StillImageData stillImageData;// = new(this.Plugin);
 
-        public AtemControlInterface atemControlInterface;
+        //  public AtemControlInterface atemControlInterface;
+
+      //  private readonly ServiceDirectory sd = new ServiceDirectory();
+
+
+       // public readonly BlinkenLightsTimeSource blinkenLightsTimeSource = new();
 
         public static event Action PluginReady;
+
+
+
 
 
         // Initializes a new instance of the plugin class.
@@ -33,8 +41,8 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
             // Initialize the plugin resources.
             PluginResources.Init(this.Assembly);
 
-            this.stillImageData = new StillImageData(this);
-
+            ServiceDirectory.Register(new StillImageData(this));
+            ServiceDirectory.Register(new BlinkenLightsTimeSource());
         }
 
 
@@ -43,43 +51,25 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
         // This method is called when the plugin is loaded.
         public override void Load()
         {
-            //       Environment.SetEnvironmentVariable("DOTNET_SYSTEM_DRAWING_ENABLE_UNIX_SUPPORT", "1", EnvironmentVariableTarget.Process);
-                      
-                    // this.AddDynamicAction(new SetStillImageCommand(ata));
 
-            this.stillImageData.LoadData();
-            this.atemControlInterface = new AtemControlInterface(this.stillImageData);
-
-            //   this.AddDynamicAction(new ImageScrollAdjustment(true));
+            var stillImageData = (StillImageData)ServiceDirectory.Get(ServiceDirectory.T_StillImageData);
+            stillImageData.LoadData();
+            ServiceDirectory.Register(new AtemControlInterface(stillImageData));
 
             PluginReady?.Invoke();
 
-            this.atemControlInterface.Connect();
-
+            ((AtemControlInterface)ServiceDirectory.Get(ServiceDirectory.T_AtemControlInterface)).Connect();
         }
 
         // This method is called when the plugin is unloaded.
         public override void Unload()
         {
-            this.atemControlInterface.Dispose();
-            this.stillImageData.Save();
+            ((AtemControlInterface)ServiceDirectory.Get(ServiceDirectory.T_AtemControlInterface)).Dispose();
+            ((StillImageData)ServiceDirectory.Get(ServiceDirectory.T_StillImageData)).Save();
 
         }
 
-        public Object initAtemCommand(IAtemCommand command) {
-
-            PluginLog.Verbose($"[LoupedeckAtemControlerPlugin] initialize ATEM command {command.GetType()}");
-
-            if (this.atemControlInterface == null)
-            {
-                PluginLog.Error($"[LoupedeckAtemControlerPlugin] AtemControlInterface not initialized !");
-                return null;
-            }
-
-            command.SetAtemClient(this.atemControlInterface);
-            return command;
-        }
-
+        
 
 
 
