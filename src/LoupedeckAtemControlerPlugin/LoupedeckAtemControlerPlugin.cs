@@ -2,6 +2,7 @@
 namespace Loupedeck.LoupedeckAtemControlerPlugin
 {
     using System;
+    using System.Net.Sockets;
 
     using Loupedeck.LoupedeckAtemControlerPlugin.ATEM;
     using Loupedeck.LoupedeckAtemControlerPlugin.Helpers;
@@ -17,20 +18,9 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
         public override Boolean HasNoApplication => true;
 
 
-        // public readonly StillImageData stillImageData;// = new(this.Plugin);
-
-        //  public AtemControlInterface atemControlInterface;
-
-      //  private readonly ServiceDirectory sd = new ServiceDirectory();
-
-
-       // public readonly BlinkenLightsTimeSource blinkenLightsTimeSource = new();
-
         public static event Action PluginReady;
 
-
-
-
+      
 
         // Initializes a new instance of the plugin class.
         public LoupedeckAtemControlerPlugin()
@@ -38,15 +28,21 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
             // Initialize the plugin log.
             PluginLog.Init(this.Log);
 
+
             // Initialize the plugin resources.
             PluginResources.Init(this.Assembly);
 
             ServiceDirectory.Register(new StillImageData(this));
             ServiceDirectory.Register(new BlinkenLightsTimeSource());
+
+
+
+
+
         }
 
 
-   
+
 
         // This method is called when the plugin is loaded.
         public override void Load()

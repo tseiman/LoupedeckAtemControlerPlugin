@@ -1,20 +1,46 @@
-
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34408.163
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LoupedeckAtemControlerPlugin", "LoupedeckAtemControlerPlugin\LoupedeckAtemControlerPlugin.csproj", "{43488AEF-BD79-4698-A1F6-6403E652A924}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LibAtem", "..\LibAtem\LibAtem\LibAtem.csproj", "{72E2DC6E-0EEA-41F1-A4C4-50E30062C011}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
 		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{43488AEF-BD79-4698-A1F6-6403E652A924}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{43488AEF-BD79-4698-A1F6-6403E652A924}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43488AEF-BD79-4698-A1F6-6403E652A924}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{43488AEF-BD79-4698-A1F6-6403E652A924}.Debug|x64.Build.0 = Debug|Any CPU
+		{43488AEF-BD79-4698-A1F6-6403E652A924}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{43488AEF-BD79-4698-A1F6-6403E652A924}.Debug|x86.Build.0 = Debug|Any CPU
 		{43488AEF-BD79-4698-A1F6-6403E652A924}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{43488AEF-BD79-4698-A1F6-6403E652A924}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43488AEF-BD79-4698-A1F6-6403E652A924}.Release|x64.ActiveCfg = Release|Any CPU
+		{43488AEF-BD79-4698-A1F6-6403E652A924}.Release|x64.Build.0 = Release|Any CPU
+		{43488AEF-BD79-4698-A1F6-6403E652A924}.Release|x86.ActiveCfg = Release|Any CPU
+		{43488AEF-BD79-4698-A1F6-6403E652A924}.Release|x86.Build.0 = Release|Any CPU
+		{72E2DC6E-0EEA-41F1-A4C4-50E30062C011}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{72E2DC6E-0EEA-41F1-A4C4-50E30062C011}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{72E2DC6E-0EEA-41F1-A4C4-50E30062C011}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{72E2DC6E-0EEA-41F1-A4C4-50E30062C011}.Debug|x64.Build.0 = Debug|Any CPU
+		{72E2DC6E-0EEA-41F1-A4C4-50E30062C011}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{72E2DC6E-0EEA-41F1-A4C4-50E30062C011}.Debug|x86.Build.0 = Debug|Any CPU
+		{72E2DC6E-0EEA-41F1-A4C4-50E30062C011}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{72E2DC6E-0EEA-41F1-A4C4-50E30062C011}.Release|Any CPU.Build.0 = Release|Any CPU
+		{72E2DC6E-0EEA-41F1-A4C4-50E30062C011}.Release|x64.ActiveCfg = Release|Any CPU
+		{72E2DC6E-0EEA-41F1-A4C4-50E30062C011}.Release|x64.Build.0 = Release|Any CPU
+		{72E2DC6E-0EEA-41F1-A4C4-50E30062C011}.Release|x86.ActiveCfg = Release|Any CPU
+		{72E2DC6E-0EEA-41F1-A4C4-50E30062C011}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

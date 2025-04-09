@@ -61,7 +61,6 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.ATEM
                     this._connected = false;
                 };
             */
-
             this.AtemClient.OnConnection += this.OnConnect;
             this.AtemClient.OnDisconnect += this.OnDisconnect;
             this.AtemClient.OnReceive += this.OnCommand; 
