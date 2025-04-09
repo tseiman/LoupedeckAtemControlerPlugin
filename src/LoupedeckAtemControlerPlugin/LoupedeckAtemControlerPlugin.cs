@@ -28,16 +28,12 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
             // Initialize the plugin log.
             PluginLog.Init(this.Log);
 
-
             // Initialize the plugin resources.
             PluginResources.Init(this.Assembly);
+          //  _ = typeof(System.Security.Cryptography.HashAlgorithm).Assembly;
 
             ServiceDirectory.Register(new StillImageData(this));
             ServiceDirectory.Register(new BlinkenLightsTimeSource());
-
-
-
-
 
         }
 
