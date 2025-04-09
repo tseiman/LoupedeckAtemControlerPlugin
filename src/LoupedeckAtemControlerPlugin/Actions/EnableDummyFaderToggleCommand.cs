@@ -2,14 +2,13 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 {
     using System;
 
-    using Loupedeck.LoupedeckAtemControlerPlugin.ATEM;
     using Loupedeck.LoupedeckAtemControlerPlugin.Helpers;
     using Loupedeck.LoupedeckAtemControlerPlugin.MultiWheel;
 
 
 
     // This class implements an example command that counts button presses.
-    public class EnableMixFaderToggleCommand : PluginMultistateDynamicCommand, IBlinkenLightsReceiver, IMultiWheelDispatchable
+    public class EnableDummyFaderToggleCommand : PluginMultistateDynamicCommand, IBlinkenLightsReceiver, IMultiWheelDispatchable
     {
         private Boolean _blinkState = true;
         private MultiWheelDispatch _mwd;
@@ -20,54 +19,53 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
 
 
-      
+
 
         // Initializes the command class.
-        public EnableMixFaderToggleCommand()
-               : base(groupName: "Wheel Select", displayName: "Enable Mix Fader", description: "This enables a knob as Fader with the Mix Fader Adjustment")
+        public EnableDummyFaderToggleCommand()
+               : base(groupName: "Wheel Select", displayName: "Enable Dummy Fader", description: "This is just to select multi fader with big multi wheel")
         {
             this.IsWidget = true;   // I was looking for this setting for days - it let's the graphics control fully to the Plugin and doesn't rewrite displayText extra
                                     // it prevents as well the user to change the Icons
 
             LoupedeckAtemControlerPlugin.PluginReady += this.OnPluginReady;
 
+   
 
-
-            this.AddState("OFF", "Mix Fader\nOFF", "Mix Fader ON");
-            this.AddState("ON", "Mix Fader\nON", "Mix Fader ON");
+            this.AddState("OFF", "Dummy Fader\nOFF", "Dummy Fader ON");
+            this.AddState("ON", "Dummy Fader\nON", "Dummy Fader ON");
 
 
 
         }
 
+        private class DummAdjustment : IMultiWheelAtemAdjustment {
+            public void ApplyAdjustment(Int32 diff) => PluginLog.Verbose($"[DummAdjustment] applyAdjustment {diff}");
+        }
 
 
         private void OnPluginReady()
         {
             ((BlinkenLightsTimeSource)ServiceDirectory.Get(ServiceDirectory.T_BlinkenLightsTimeSource)).RegisterBlinkenLightReceiver(this);
             this._mwd = (MultiWheelDispatch)ServiceDirectory.Get(ServiceDirectory.T_MultiWheelDispatch);
-
-            var atemCommandSetFader = new AtemCommandMultiWheelSetFader();
-            this._mwd.RegisterDispatchable(this, atemCommandSetFader);
-
+            this._mwd.RegisterDispatchable(this, new DummAdjustment());
         }
 
 
         // This method is called when the user executes the command.
         protected override void RunCommand(String actionParameter)
         {
-            PluginLog.Verbose($"[EnableMixFaderToggleCommand] ToggleCurrentState {this.GetCurrentState().Name}");
+            PluginLog.Verbose($"[EnableDummyFaderToggleCommand] ToggleCurrentState {this.GetCurrentState().Name}");
             this.ToggleCurrentState();
             if (this.GetCurrentState().Name.Equals("ON"))
             {
-                this._mwd.InformActive(this);
                 this._blinkState = true;
+                this._mwd.InformActive(this);
             }
             else
             {
                 this._mwd.InformInActive(this);
             }
-
         }
 
 
@@ -114,7 +112,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
         }
 
         public void Disengage() {
-            PluginLog.Verbose($"[EnableMixFaderToggleCommand] Disangage");
+            PluginLog.Verbose($"[EnableDummyFaderToggleCommand] Disangage");
             this.SetCurrentState(0);
             this.ActionImageChanged();
         }

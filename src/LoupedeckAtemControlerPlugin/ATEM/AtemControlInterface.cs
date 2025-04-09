@@ -33,9 +33,9 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.ATEM
         private readonly List<Action> _onConnectEvent = new();
 
 
-        public AtemControlInterface(StillImageData imageData)
+        public AtemControlInterface()
         {
-            this._imageData = imageData;
+            this._imageData = (StillImageData)ServiceDirectory.Get(ServiceDirectory.T_StillImageData);
             PluginLog.Info($"[AtemControlInterface] Trying to connect to ATEM {this._imageData.AtemURI}");
 
         }

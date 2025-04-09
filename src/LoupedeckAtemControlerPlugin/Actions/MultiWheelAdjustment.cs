@@ -1,15 +1,15 @@
 
 namespace Loupedeck.LoupedeckAtemControlerPlugin
 {
-
-
-
+    using Loupedeck.LoupedeckAtemControlerPlugin.MultiWheel;
 
     public class MultiWheelAdjustment : PluginDynamicAdjustment
     {
-        private Int32 _currentFaderPos;
+        private MultiWheelDispatch _mwd;
 
-        private LoupedeckAtemControlerPlugin _plugin => (LoupedeckAtemControlerPlugin)this.Plugin;
+        // private Int32 _currentFaderPos;
+
+        //  private LoupedeckAtemControlerPlugin _plugin => (LoupedeckAtemControlerPlugin)this.Plugin;
 
         public MultiWheelAdjustment()
                : base(groupName: "Wheel Select", displayName: "Multi wheel Adjustment", description: "Can do Cross Mix, TBD",hasReset: false)
@@ -26,6 +26,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
         private void OnPluginReady()
         {
             PluginLog.Verbose($"[MultiWheelAdjustment] OnPluginReady");
+            this._mwd = (MultiWheelDispatch)ServiceDirectory.Get(ServiceDirectory.T_MultiWheelDispatch);
 
 
         }
@@ -33,27 +34,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
         protected override void ApplyAdjustment(String actionParameter, Int32 diff)
         {
-          
-
-
-            this._currentFaderPos += diff;
-
-
-            if (this._currentFaderPos >= 9999)
-            {
-                this._currentFaderPos = 9999;
-            }
-
-
-            if (this._currentFaderPos < 0)
-            {
-                this._currentFaderPos = 0;
-            }
-
-
-            PluginLog.Verbose($"[ImageScroll] ApplyAdjustment → index: {this._currentFaderPos}, actionParam: {actionParameter}");
-
-
+            this._mwd.ApplyAdjustment(diff);
         }
 
 
@@ -64,7 +45,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
         protected override String GetAdjustmentValue(String actionParameter)
         {
-            return $"{this._currentFaderPos}";
+            return "";
         }
 
 

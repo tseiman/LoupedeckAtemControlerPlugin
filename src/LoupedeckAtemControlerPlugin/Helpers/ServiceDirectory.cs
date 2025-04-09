@@ -7,6 +7,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
     using Loupedeck.LoupedeckAtemControlerPlugin.ATEM;
     using Loupedeck.LoupedeckAtemControlerPlugin.Helpers;
+    using Loupedeck.LoupedeckAtemControlerPlugin.MultiWheel;
 
     public static class ServiceDirectory
     {
@@ -15,6 +16,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
         public static readonly Type T_StillImageData = typeof(StillImageData);
         public static readonly Type T_AtemControlInterface = typeof(AtemControlInterface);
         public static readonly Type T_BlinkenLightsTimeSource = typeof(BlinkenLightsTimeSource);
+        public static readonly Type T_MultiWheelDispatch = typeof(MultiWheelDispatch);
 
 
         private static readonly Dictionary<Type, Object> sd = new();    // This plugin provides various serives such as Still Image select, 

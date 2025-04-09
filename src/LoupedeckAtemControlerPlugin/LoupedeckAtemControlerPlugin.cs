@@ -6,6 +6,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
     using Loupedeck.LoupedeckAtemControlerPlugin.ATEM;
     using Loupedeck.LoupedeckAtemControlerPlugin.Helpers;
+    using Loupedeck.LoupedeckAtemControlerPlugin.MultiWheel;
 
     // This class contains the plugin-level logic of the Loupedeck plugin.
 
@@ -34,7 +35,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
             ServiceDirectory.Register(new StillImageData(this));
             ServiceDirectory.Register(new BlinkenLightsTimeSource());
-
+   
         }
 
 
@@ -46,7 +47,8 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
             var stillImageData = (StillImageData)ServiceDirectory.Get(ServiceDirectory.T_StillImageData);
             stillImageData.LoadData();
-            ServiceDirectory.Register(new AtemControlInterface(stillImageData));
+            ServiceDirectory.Register(new AtemControlInterface());
+            ServiceDirectory.Register(new MultiWheelDispatch());
 
             PluginReady?.Invoke();
 
