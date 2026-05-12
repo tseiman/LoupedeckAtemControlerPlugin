@@ -24,8 +24,9 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
             LoupedeckAtemControlerPlugin.PluginReady += this.OnPluginReady;
 
-            this.AddState("ON", "Preview Transition ON", "Preview Transition ON");
             this.AddState("OFF", "Preview Transition OFF", "Preview Transition OFF");
+            this.AddState("ON", "Preview Transition ON", "Preview Transition ON");
+
         }
 
 
@@ -41,8 +42,8 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
         private void GetToggleEvent(Boolean state)
         {
             if (state)
-            { this.SetCurrentState(0); } else
-            { this.SetCurrentState(1); }
+            { this.SetCurrentState(1); } else
+            { this.SetCurrentState(0); }
             
         }
 
@@ -57,8 +58,8 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
             this._atemCommandTogglePreview.TogglePreview(this.GetCurrentState().Name.Equals("ON"));
 
-            
 
+            this.ActionImageChanged();
         }
 
 
