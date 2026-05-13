@@ -4,7 +4,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.Helpers
 
     public static class AtemVisuals
     {
-        private static readonly BitmapColor OfflineBackground = new(0x24, 0x24, 0x24);
+        private static readonly BitmapColor OfflineBackground = new(0x80, 0x80, 0x80);
         private static readonly BitmapColor OfflineText = new(0x00, 0x00, 0x00);
 
         public static Boolean IsAtemConnected()

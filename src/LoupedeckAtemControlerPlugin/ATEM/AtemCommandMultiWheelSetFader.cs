@@ -10,12 +10,14 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.ATEM
     public class AtemCommandMultiWheelSetFader : IAtemCommand, IMultiWheelAtemAdjustment
     {
         private const Double MinHandlePosition = 0.0;
-        private const Double MaxHandlePosition = 0.9999;
+        private const Double MaxHandlePosition = 1.0;
         private const Double WheelStep = 0.0125;
         private const Double EndSnapDistance = 0.02;
 
         private Double _transitionPos;
         private Boolean _inTransition;
+        private Int32 _activeWheelDirection;
+        private Int32 _completedWheelDirection;
 
         public AtemCommandMultiWheelSetFader()
         {
@@ -33,6 +35,11 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.ATEM
             var tmpCmd = (TransitionPositionGetCommand)command;
             this._transitionPos = SnapEndpoint(ClampHandlePosition(tmpCmd.HandlePosition));
             this._inTransition = tmpCmd.InTransition;
+            if (!this._inTransition && this._transitionPos <= MinHandlePosition + EndSnapDistance)
+            {
+                this._transitionPos = MinHandlePosition;
+                this._activeWheelDirection = 0;
+            }
 
             PluginLog.Verbose($"[AtemCommandSetFader] updated Fader Pos {this._transitionPos}, in trans: {tmpCmd.InTransition}, rem frms: {tmpCmd.RemainingFrames}");
         }
@@ -46,10 +53,22 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.ATEM
 
             PluginLog.Verbose($"[AtemCommandSetFader] applyAdjustment {diff}");
 
-            var step = diff * WheelStep;
+            var wheelDirection = diff > 0 ? 1 : -1;
             if (!this._inTransition && this._transitionPos <= MinHandlePosition + EndSnapDistance)
             {
-                step = Math.Abs(diff) * WheelStep;
+                if (this._completedWheelDirection == wheelDirection)
+                {
+                    return;
+                }
+
+                this._activeWheelDirection = wheelDirection;
+                this._completedWheelDirection = 0;
+            }
+
+            var step = diff * WheelStep;
+            if (this._activeWheelDirection != 0)
+            {
+                step = diff * this._activeWheelDirection * WheelStep;
             }
 
             var nextPos = SnapEndpoint(ClampHandlePosition(this._transitionPos + step));
@@ -66,6 +85,11 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.ATEM
             {
                 this._transitionPos = nextPos;
                 this._inTransition = nextPos > MinHandlePosition && nextPos < MaxHandlePosition;
+                if (nextPos >= MaxHandlePosition - EndSnapDistance)
+                {
+                    this._completedWheelDirection = this._activeWheelDirection;
+                    this._activeWheelDirection = 0;
+                }
             }
 
 

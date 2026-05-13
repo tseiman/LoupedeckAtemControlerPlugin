@@ -16,6 +16,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
                : base(groupName: "Wheel Select", displayName: "Multi wheel Adjustment", description: "Can do Cross Mix, TBD",hasReset: false)
         {
 
+            this.IsWidget = true;
 
             LoupedeckAtemControlerPlugin.PluginReady += this.OnPluginReady;
 
