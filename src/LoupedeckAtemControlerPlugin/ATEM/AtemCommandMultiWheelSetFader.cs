@@ -7,7 +7,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.ATEM
 
     using Loupedeck.LoupedeckAtemControlerPlugin.MultiWheel;
 
-    public class AtemCommandMultiWheelSetFader : IAtemCommand, IMultiWheelAtemAdjustment
+    public class AtemCommandMultiWheelSetFader : IAtemCommand, IMultiWheelAtemAdjustment, IMultiWheelDisplayable
     {
         private const Double MinHandlePosition = 0.0;
         private const Double MaxHandlePosition = 1.0;
@@ -18,6 +18,12 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.ATEM
         private Boolean _inTransition;
         private Int32 _activeWheelDirection;
         private Int32 _completedWheelDirection;
+
+        public event Action DisplayChanged;
+
+        public String DisplayName => "ATEM Fader";
+
+        public Int32 DisplayPercent => (Int32)Math.Round(this._transitionPos * 100);
 
         public AtemCommandMultiWheelSetFader()
         {
@@ -40,6 +46,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.ATEM
                 this._transitionPos = MinHandlePosition;
                 this._activeWheelDirection = 0;
             }
+            this.DisplayChanged?.Invoke();
 
             PluginLog.Verbose($"[AtemCommandSetFader] updated Fader Pos {this._transitionPos}, in trans: {tmpCmd.InTransition}, rem frms: {tmpCmd.RemainingFrames}");
         }
@@ -90,6 +97,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.ATEM
                     this._completedWheelDirection = this._activeWheelDirection;
                     this._activeWheelDirection = 0;
                 }
+                this.DisplayChanged?.Invoke();
             }
 
 

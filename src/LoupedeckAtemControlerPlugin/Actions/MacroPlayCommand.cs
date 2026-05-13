@@ -15,8 +15,6 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
         //   private LoupedeckAtemControlerPlugin _plugin => (LoupedeckAtemControlerPlugin)this.Plugin;
 
         private String _currentState = "";
-        private BitmapImage _image;
-
         // Initializes the command class.
         public MacroPlayCommand()
             : base(groupName: "Misc", displayName: "Run Macro", description: "Runs a macro which was predefined in the ATEM GUI")
@@ -30,6 +28,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
             this.AddState("ON", "In Macro", "Macro is Running");
             this.AddState("OFF", "Out Macro" , "Run Macro");
+            this._currentState = "OFF";
 
             this.MakeProfileAction("list;aaaa:");
 
@@ -103,32 +102,24 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
 
 
-            PluginLog.Verbose($"[MacroPlayCommand] GetCommandImage {this._currentState}////{actionParameter}//{stateIndex}// ,  {this.GetCurrentState(this._currentState).Name}");
+            var currentStateName = this.GetCurrentMacroStateName(actionParameter);
+            var currentStateDisplayName = this.GetCurrentMacroStateDisplayName(actionParameter);
 
             using (var bitmapBuilder = new BitmapBuilder(imageSize))
             {
 
-                if (this._currentState.Equals("ON"))// && this._blinkState 
+                if (currentStateName.Equals("ON"))// && this._blinkState 
                 {
                     AtemVisuals.FillBackground(bitmapBuilder, imageSize, BitmapColor.Green);
-                    AtemVisuals.DrawText(bitmapBuilder, this.GetCurrentState(this._currentState).DisplayName);
-                }
-                else if (this._currentState.Equals("OFF"))
-                {
-                    AtemVisuals.FillBackground(bitmapBuilder, imageSize, BitmapColor.Black);
-                    AtemVisuals.DrawText(bitmapBuilder, this.GetCurrentState(this._currentState).DisplayName);
+                    AtemVisuals.DrawText(bitmapBuilder, currentStateDisplayName);
                 }
                 else
                 {
-                    return this._image;
+                    AtemVisuals.FillBackground(bitmapBuilder, imageSize, BitmapColor.Black);
+                    AtemVisuals.DrawText(bitmapBuilder, currentStateDisplayName);
                 }
 
-                //      bitmapBuilder.FillRectangle(0, 0, imageSize.GetWidth(), imageSize.GetHeight(), BitmapColor.Black);
-
-                //   bitmapBuilder.DrawText(this.GetCurrentState(this._currentState).DisplayName);
-
-                this._image = bitmapBuilder.ToImage();
-                return this._image;
+                return bitmapBuilder.ToImage();
             }
 
         }
@@ -136,11 +127,26 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
         protected override String GetCommandDisplayName(String actionParameter,  PluginImageSize imageSize)
         {
-                     PluginLog.Verbose($"[MacroPlayCommand] GetCommandDisplayName {this.GetCurrentState(actionParameter).Name},  {this.GetCurrentState(actionParameter).Description},  {this.GetCurrentState(actionParameter).DisplayName}");
-                       return this.GetCurrentState(this._currentState).DisplayName;
+            return this.GetCurrentMacroStateDisplayName(actionParameter);
 
-            // return "aaaaa";
+        }
 
+        private String GetCurrentMacroStateName(String actionParameter)
+        {
+            if (this._currentState.Equals("ON") || this._currentState.Equals("OFF"))
+            {
+                return this.GetCurrentState(this._currentState).Name;
+            }
+
+            var state = this.GetCurrentState(actionParameter);
+            this._currentState = state?.Name ?? "OFF";
+            return this._currentState;
+        }
+
+        private String GetCurrentMacroStateDisplayName(String actionParameter)
+        {
+            var stateName = this.GetCurrentMacroStateName(actionParameter);
+            return this.GetCurrentState(stateName).DisplayName;
         }
         
 

@@ -8,6 +8,8 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.MultiWheel
 
     public class MultiWheelDispatch
     {
+        public event Action DisplayChanged;
+
 
         private class DispatcherData
         {
@@ -31,6 +33,11 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.MultiWheel
 
         private DispatcherData _activeDispatcher;
 
+        public Boolean HasActiveDispatcher => this._activeDispatcher != null;
+
+        public IMultiWheelDisplayable ActiveDisplay =>
+            this._activeDispatcher?.multiWheelAtemAdjustment as IMultiWheelDisplayable;
+
 
         public MultiWheelDispatch()
         {
@@ -47,12 +54,14 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.MultiWheel
 
             // PluginLog.Verbose($"[MultiWheelDispatch] ApplyAdjustment: {diff}");
             this._activeDispatcher.multiWheelAtemAdjustment.ApplyAdjustment(diff);
+            this.DisplayChanged?.Invoke();
 
         }
 
         public void InformActive(IMultiWheelDispatchable dispatchable)
         {
             this._activeDispatcher = this._dispatchables[dispatchable.GetType()];
+            this.DisplayChanged?.Invoke();
 
             foreach (var (type, disp_obj) in this._dispatchables)
             {
@@ -68,12 +77,20 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.MultiWheel
             if (this._activeDispatcher != null && dispatchable.GetType() == this._activeDispatcher.dispatcherType)
             {
                 this._activeDispatcher = null;
+                this.DisplayChanged?.Invoke();
             }
         }
 
 
         public void RegisterDispatchable(IMultiWheelDispatchable dispatchable, IMultiWheelAtemAdjustment imwaa)
-            => this._dispatchables[dispatchable.GetType()] = new DispatcherData(dispatchable.GetType(),dispatchable, imwaa);
+        {
+            if (imwaa is IMultiWheelDisplayable displayable)
+            {
+                displayable.DisplayChanged += () => this.DisplayChanged?.Invoke();
+            }
+
+            this._dispatchables[dispatchable.GetType()] = new DispatcherData(dispatchable.GetType(), dispatchable, imwaa);
+        }
 
     }
 }
