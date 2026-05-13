@@ -11,7 +11,8 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.ATEM
     {
         private const Double MinHandlePosition = 0.0;
         private const Double MaxHandlePosition = 0.9999;
-        private const Double WheelStep = 0.025;
+        private const Double WheelStep = 0.0125;
+        private const Double EndSnapDistance = 0.02;
 
         private Double _transitionPos;
         private Boolean _inTransition;
@@ -30,7 +31,14 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.ATEM
             PluginLog.Verbose($"[AtemCommandSetFader] received command {command.GetType().Name}");
 
             var tmpCmd = (TransitionPositionGetCommand)command;
-            this._transitionPos = ClampHandlePosition(tmpCmd.HandlePosition);
+            var reportedPosition = ClampHandlePosition(tmpCmd.HandlePosition);
+
+            if (!tmpCmd.InTransition && reportedPosition <= EndSnapDistance && this._transitionPos >= MaxHandlePosition - EndSnapDistance)
+            {
+                reportedPosition = MaxHandlePosition;
+            }
+
+            this._transitionPos = SnapEndpoint(reportedPosition);
             this._inTransition = tmpCmd.InTransition;
 
             PluginLog.Verbose($"[AtemCommandSetFader] updated Fader Pos {this._transitionPos}, in trans: {tmpCmd.InTransition}, rem frms: {tmpCmd.RemainingFrames}");
@@ -45,11 +53,10 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.ATEM
 
             PluginLog.Verbose($"[AtemCommandSetFader] applyAdjustment {diff}");
 
-            var nextPos = ClampHandlePosition(this._transitionPos + (diff * WheelStep));
-
-            if (!this._inTransition && this._transitionPos <= MinHandlePosition && diff < 0)
+            var nextPos = SnapEndpoint(ClampHandlePosition(this._transitionPos + (diff * WheelStep)));
+            if (PositionsEqual(nextPos, this._transitionPos))
             {
-                nextPos = WheelStep;
+                return;
             }
 
             PluginLog.Verbose($"[AtemCommandSetFader] try to set transPos: {nextPos}, previousPos: {this._transitionPos}, inTransition: {this._inTransition}");
@@ -75,6 +82,23 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.ATEM
             }
 
             if (value > MaxHandlePosition)
+            {
+                return MaxHandlePosition;
+            }
+
+            return value;
+        }
+
+        private static Boolean PositionsEqual(Double left, Double right) => Math.Abs(left - right) < 0.00001;
+
+        private static Double SnapEndpoint(Double value)
+        {
+            if (value <= MinHandlePosition + EndSnapDistance)
+            {
+                return MinHandlePosition;
+            }
+
+            if (value >= MaxHandlePosition - EndSnapDistance)
             {
                 return MaxHandlePosition;
             }
