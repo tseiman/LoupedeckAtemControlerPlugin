@@ -40,7 +40,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
         {
 
             PluginLog.Verbose($"[ImageScroll] Initializing ...");
-            AtemVisuals.RegisterConnectionRefresh(this.ActionImageChanged);
+            AtemVisuals.RegisterConnectionRefresh(this.RefreshAdjustmentDisplay);
 
             var stillImageData = (StillImageData)ServiceDirectory.Get(ServiceDirectory.T_StillImageData);
 
@@ -50,8 +50,12 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
                 this.SetupFsWatcher();
                 this.OnChanged(null, null);
                 PluginLog.Verbose($"[ImageScroll] Loading images from stored config path {stillImageData.ImagePath}");
-                stillImageData.ActualFullImagePath = this._imageFiles[this._currentIndex];
-                this.ActionImageChanged();
+                if (this._imageFiles.Length > 0)
+                {
+                    this._currentIndex = Math.Clamp(this._currentIndex, 0, this._imageFiles.Length - 1);
+                    stillImageData.ActualFullImagePath = this._imageFiles[this._currentIndex];
+                }
+                this.RefreshAdjustmentDisplay();
             }
 
 
@@ -144,7 +148,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
             if (this._currentIndex >= this._imageFiles.Length)
             {
-                this._currentIndex = this._imageFiles.Length;
+                this._currentIndex = this._imageFiles.Length - 1;
             }
 
 
@@ -164,13 +168,17 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
             }
 
-            this.ActionImageChanged();
+            this.RefreshAdjustmentDisplay();
 
         }
 
 
         protected override String GetAdjustmentDisplayName(String actionParameter, PluginImageSize imageSize)
         {
+            if (this._imageFiles == null || this._imageFiles.Length == 0)
+            {
+                return "No Images";
+            }
 
 
             var path = this._imageFiles[this._currentIndex];
@@ -200,15 +208,53 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
         protected override BitmapImage GetAdjustmentImage(String actionParameter, PluginImageSize imageSize)
         {
+            if (this._imageFiles == null || this._imageFiles.Length == 0)
+            {
+                using (var bitmapBuilder = new BitmapBuilder(imageSize))
+                {
+                    AtemVisuals.FillBackground(bitmapBuilder, imageSize, BitmapColor.Black);
+                    AtemVisuals.DrawText(bitmapBuilder, "No\nImages");
+                    return bitmapBuilder.ToImage();
+                }
+            }
+
+            this._currentIndex = Math.Clamp(this._currentIndex, 0, this._imageFiles.Length - 1);
             var path = this._imageFiles[this._currentIndex];
+
+            if (!File.Exists(path))
+            {
+                using (var bitmapBuilder = new BitmapBuilder(imageSize))
+                {
+                    AtemVisuals.FillBackground(bitmapBuilder, imageSize, BitmapColor.Black);
+                    AtemVisuals.DrawText(bitmapBuilder, "Img not\nFound");
+                    return bitmapBuilder.ToImage();
+                }
+            }
 
             using (var bitmapBuilder = new BitmapBuilder(imageSize))
             {
-                bitmapBuilder.SetBackgroundImage(BitmapImage.FromFile(path));
+                try
+                {
+                    PluginLog.Verbose($"[ImageScroll] Rendering image preview {imageSize.GetWidth()}x{imageSize.GetHeight()} from {path}");
+                    bitmapBuilder.SetBackgroundImage(StillImagePreview.Load(path, imageSize));
+                }
+                catch (Exception e)
+                {
+                    PluginLog.Warning($"[ImageScroll] Could not render image preview {path}: {e}");
+                    AtemVisuals.FillBackground(bitmapBuilder, imageSize, BitmapColor.Black);
+                    AtemVisuals.DrawText(bitmapBuilder, "Img\nError");
+                }
+
                 AtemVisuals.ApplyOfflineOverlay(bitmapBuilder, imageSize);
                 return bitmapBuilder.ToImage();
             }
          
+        }
+
+        private void RefreshAdjustmentDisplay()
+        {
+            this.ActionImageChanged();
+            this.AdjustmentValueChanged("");
         }
 
 

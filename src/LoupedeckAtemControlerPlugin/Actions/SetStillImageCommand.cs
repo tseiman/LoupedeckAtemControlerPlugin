@@ -1,6 +1,7 @@
 namespace Loupedeck.LoupedeckAtemControlerPlugin
 {
     using System;
+    using System.IO;
     using log4net.Plugin;
 
     using Loupedeck.LoupedeckAtemControlerPlugin.ATEM;
@@ -94,9 +95,29 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
         protected override BitmapImage GetCommandImage(String actionParameter, PluginImageSize imageSize)
         {
+            var stillImageData = (StillImageData)ServiceDirectory.Get(ServiceDirectory.T_StillImageData);
+
             using (var bitmapBuilder = new BitmapBuilder(imageSize))
             {
-                AtemVisuals.FillBackground(bitmapBuilder, imageSize, BitmapColor.Black);
+                if (stillImageData != null && File.Exists(stillImageData.ActualFullImagePath))
+                {
+                    try
+                    {
+                        PluginLog.Verbose($"[SetStillImageCommand] Rendering image preview {imageSize.GetWidth()}x{imageSize.GetHeight()} from {stillImageData.ActualFullImagePath}");
+                        bitmapBuilder.SetBackgroundImage(StillImagePreview.Load(stillImageData.ActualFullImagePath, imageSize));
+                        AtemVisuals.ApplyOfflineOverlay(bitmapBuilder, imageSize);
+                    }
+                    catch (Exception e)
+                    {
+                        PluginLog.Warning($"[SetStillImageCommand] Could not render image preview {stillImageData.ActualFullImagePath}: {e}");
+                        AtemVisuals.FillBackground(bitmapBuilder, imageSize, BitmapColor.Black);
+                    }
+                }
+                else
+                {
+                    AtemVisuals.FillBackground(bitmapBuilder, imageSize, BitmapColor.Black);
+                }
+
                 AtemVisuals.DrawText(bitmapBuilder, "Set Still\nImage");
 
                 return bitmapBuilder.ToImage();
