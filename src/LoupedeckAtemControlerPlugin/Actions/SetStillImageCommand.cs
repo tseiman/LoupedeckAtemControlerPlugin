@@ -106,7 +106,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
                         PluginLog.Verbose($"[SetStillImageCommand] Rendering image preview {imageSize.GetWidth()}x{imageSize.GetHeight()} from {stillImageData.ActualFullImagePath}");
                         if (AtemVisuals.IsAtemConnected())
                         {
-                            return StillImagePreview.LoadScaled(stillImageData.ActualFullImagePath, imageSize, 3.0);
+                            return StillImagePreview.LoadScaledWithText(stillImageData.ActualFullImagePath, imageSize, 3.0, this.GetStillImageDisplayText());
                         }
 
                         bitmapBuilder.SetBackgroundImage(StillImagePreview.LoadScaled(stillImageData.ActualFullImagePath, imageSize, 3.0));
