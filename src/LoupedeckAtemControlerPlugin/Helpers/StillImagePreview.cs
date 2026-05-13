@@ -25,7 +25,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.Helpers
             var requestedHeight = Math.Max(1, imageSize.GetHeight());
             var width = Math.Max(requestedWidth, (Int32)Math.Round(requestedWidth * scale));
             var height = Math.Max(requestedHeight, (Int32)Math.Round(requestedHeight * scale));
-            return Load(path, width, height, ResizeMode.Crop);
+            return Load(path, width, height, ResizeMode.Max);
         }
 
         private static BitmapImage Load(String path, Int32 width, Int32 height, ResizeMode resizeMode)
