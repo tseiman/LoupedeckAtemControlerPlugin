@@ -9,10 +9,12 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.ATEM
 
     public class AtemCommandMultiWheelSetFader : IAtemCommand, IMultiWheelAtemAdjustment
     {
-        private Int32 _transitionPos;
-        private Int32 _previousPos;
+        private const Double MinHandlePosition = 0.0;
+        private const Double MaxHandlePosition = 0.9999;
+        private const Double WheelStep = 0.025;
 
-        private Int32 prefix = 1;
+        private Double _transitionPos;
+        private Boolean _inTransition;
 
         public AtemCommandMultiWheelSetFader()
         {
@@ -27,64 +29,58 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.ATEM
         public void ReceiveCommand(Object sender, ICommand command) {
             PluginLog.Verbose($"[AtemCommandSetFader] received command {command.GetType().Name}");
 
-            var tmpCmd = (TransitionPositionGetCommand)command; 
-            this._transitionPos = (Int32)(tmpCmd.HandlePosition * 1000);
-            if (tmpCmd.HandlePosition == 0 && (!tmpCmd.InTransition))
-            {
-                this.prefix *= -1;
-            }
+            var tmpCmd = (TransitionPositionGetCommand)command;
+            this._transitionPos = ClampHandlePosition(tmpCmd.HandlePosition);
+            this._inTransition = tmpCmd.InTransition;
 
             PluginLog.Verbose($"[AtemCommandSetFader] updated Fader Pos {this._transitionPos}, in trans: {tmpCmd.InTransition}, rem frms: {tmpCmd.RemainingFrames}");
         }
 
         public void ApplyAdjustment(Int32 diff)
         {
-            var isUp = diff > 0 ? 1 : -1;
-
-
-
-            var tmpPos = this._transitionPos + (isUp )  * 1;
-
+            if (diff == 0)
+            {
+                return;
+            }
 
             PluginLog.Verbose($"[AtemCommandSetFader] applyAdjustment {diff}");
 
+            var nextPos = ClampHandlePosition(this._transitionPos + (diff * WheelStep));
 
-
-
-            var transPos = (Double)tmpPos / 1000;
-
-            if (tmpPos < 0)
+            if (!this._inTransition && this._transitionPos <= MinHandlePosition && diff < 0)
             {
-                transPos = 0;
-           
+                nextPos = WheelStep;
             }
 
-            if (tmpPos >= 1000)
-            {
-                transPos = 1;
+            PluginLog.Verbose($"[AtemCommandSetFader] try to set transPos: {nextPos}, previousPos: {this._transitionPos}, inTransition: {this._inTransition}");
 
-            }
-
-         /*   if (this._previousPos > 1000 && isUp > 0)
-            {
-                transPos = 0;
-               
-            }
-         */
-
-
-            PluginLog.Verbose($"[AtemCommandSetFader] try to set tmpPos: {tmpPos}, transPos: {transPos}, isUp: {isUp}, _previousPos: {this._previousPos}");
-
-
-            this._previousPos = this._transitionPos;
 
             var atemControlInterface = (AtemControlInterface)ServiceDirectory.Get(ServiceDirectory.T_AtemControlInterface);
-            atemControlInterface.SendCommand(new TransitionPositionSetCommand { Index = 0, HandlePosition = transPos });
+            if (atemControlInterface.SendCommand(new TransitionPositionSetCommand { Index = 0, HandlePosition = nextPos }))
+            {
+                this._transitionPos = nextPos;
+                this._inTransition = nextPos > MinHandlePosition && nextPos < MaxHandlePosition;
+            }
 
 
         }
 
         public void OnConnect() { }
+
+        private static Double ClampHandlePosition(Double value)
+        {
+            if (value < MinHandlePosition)
+            {
+                return MinHandlePosition;
+            }
+
+            if (value > MaxHandlePosition)
+            {
+                return MaxHandlePosition;
+            }
+
+            return value;
+        }
     }
 }
 

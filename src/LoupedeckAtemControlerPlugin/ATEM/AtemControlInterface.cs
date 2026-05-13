@@ -26,6 +26,10 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.ATEM
 
         private Boolean _connected = false;
 
+        public Boolean IsConnected => this._connected;
+
+        public event Action<Boolean> ConnectionStateChanged;
+
         public AtemClient AtemClient { get; set; } = null;
 
         private readonly Dictionary<Type, List<IAtemCommand>> _receiveCommandSubscribers = new();
@@ -81,20 +85,31 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.ATEM
         private void OnDisconnect(Object sender)
         {
             PluginLog.Info($"[AtemControlInterface] disconnected {this._imageData.AtemURI}");
-            this._connected = false;
+            this.SetConnected(false);
         }
 
 
         private void OnConnect(Object  sender)
         {
             PluginLog.Info($"[AtemControlInterface] connected {this._imageData.AtemURI}");
-            this._connected = true;
+            this.SetConnected(true);
 
             foreach (var cb in  this._onConnectEvent)
             {
                 PluginLog.Verbose($"[AtemControlInterface] triggering callback {cb}");
                 cb();
             }
+        }
+
+        private void SetConnected(Boolean connected)
+        {
+            if (this._connected == connected)
+            {
+                return;
+            }
+
+            this._connected = connected;
+            this.ConnectionStateChanged?.Invoke(connected);
         }
 
 

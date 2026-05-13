@@ -21,7 +21,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
         public SetStillImageCommand()
                : base(groupName: "Still Image Selection", displayName: "Set Still Image", description: "Uploads the currently selected Image to the ATEM mini")
         {
-       //     this.IsWidget = true;
+            this.IsWidget = true;
             LoupedeckAtemControlerPlugin.PluginReady += this.OnPluginReady;
         }
 
@@ -41,6 +41,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
             this._atemCommandSetStillMedia = new();
            // this._plugin.initAtemCommand(this._atemCommandSetStillMedia);
 
+            AtemVisuals.RegisterConnectionRefresh(this.ActionImageChanged);
 
         }
 
@@ -85,5 +86,16 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
         // This method is called when Loupedeck needs to show the command on the console or the UI.
         protected override String GetCommandDisplayName(String actionParameter, PluginImageSize imageSize) =>
             $"Press Counter Sending Image";
+
+        protected override BitmapImage GetCommandImage(String actionParameter, PluginImageSize imageSize)
+        {
+            using (var bitmapBuilder = new BitmapBuilder(imageSize))
+            {
+                AtemVisuals.FillBackground(bitmapBuilder, imageSize, BitmapColor.Black);
+                AtemVisuals.DrawText(bitmapBuilder, "Set Still\nImage");
+
+                return bitmapBuilder.ToImage();
+            }
+        }
     }
 }

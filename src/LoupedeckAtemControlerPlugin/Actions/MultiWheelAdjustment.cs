@@ -1,6 +1,7 @@
 
 namespace Loupedeck.LoupedeckAtemControlerPlugin
 {
+    using Loupedeck.LoupedeckAtemControlerPlugin.Helpers;
     using Loupedeck.LoupedeckAtemControlerPlugin.MultiWheel;
 
     public class MultiWheelAdjustment : PluginDynamicAdjustment
@@ -27,7 +28,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
         {
             PluginLog.Verbose($"[MultiWheelAdjustment] OnPluginReady");
             this._mwd = (MultiWheelDispatch)ServiceDirectory.Get(ServiceDirectory.T_MultiWheelDispatch);
-
+            AtemVisuals.RegisterConnectionRefresh(this.ActionImageChanged);
 
         }
 
@@ -58,9 +59,8 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
             using (var bitmapBuilder = new BitmapBuilder(imageSize))
             {
 
-                    bitmapBuilder.FillRectangle(0, 0, imageSize.GetWidth(), imageSize.GetHeight(), BitmapColor.Blue);
-
-                bitmapBuilder.DrawText(this.DisplayName);
+                AtemVisuals.FillBackground(bitmapBuilder, imageSize, BitmapColor.Blue);
+                AtemVisuals.DrawText(bitmapBuilder, this.DisplayName);
                 //  bitmapBuilder.SetBackgroundImage(bitmapBuilder.ToImage());
 
                 return bitmapBuilder.ToImage();

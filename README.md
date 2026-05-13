@@ -8,6 +8,41 @@ run some basic operations:
 
 ## Build
 This is a visual studio project and can be build with it.
+
+### Building without Visual Studio
+
+The project can also be built from a terminal with the .NET SDK.
+
+Prerequisites:
+
+- .NET 8 SDK
+- Logi Options+ or Loupedeck Software installed, including Logi Plugin Service
+- `PluginApi.dll` from the Logi Plugin Service installation
+- NuGet access for restoring packages
+
+On macOS the project expects the Logi Plugin Service files here:
+
+```sh
+/Applications/Utilities/LogiPluginService.app/Contents/MonoBundle/
+```
+
+On Windows the project expects them here:
+
+```bat
+C:\Program Files\Logi\LogiPluginService\
+```
+
+Build the plugin project from the repository root:
+
+```sh
+dotnet restore src/LoupedeckAtemControlerPlugin/LoupedeckAtemControlerPlugin.csproj
+dotnet build src/LoupedeckAtemControlerPlugin/LoupedeckAtemControlerPlugin.csproj --configuration Debug
+```
+
+The build creates the normal plugin output under `bin/Debug` and writes a `.link` file into the Logi Plugin Service plugins directory. Restart the Logi Plugin Service or the Loupedeck software after building.
+
+Building on Linux is useful for code checks only. The official Logi/Loupedeck Plugin SDK and Logi Plugin Service are available for Windows/macOS, so a full plugin build and runtime test needs one of those systems with `PluginApi.dll` installed.
+
 Packing the plugin: TBD
 
 ## Installation

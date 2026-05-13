@@ -2,6 +2,8 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 {
     using System;
 
+    using Loupedeck.LoupedeckAtemControlerPlugin.Helpers;
+
 
 
     // This class implements an example command that counts button presses.
@@ -24,7 +26,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
             this.IsWidget = true;
 
 
-            //        LoupedeckAtemControlerPlugin.PluginReady += this.OnPluginReady;
+            LoupedeckAtemControlerPlugin.PluginReady += this.OnPluginReady;
 
             this.AddState("ON", "In Macro", "Macro is Running");
             this.AddState("OFF", "Out Macro" , "Run Macro");
@@ -45,8 +47,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
         private void OnPluginReady()
         {
             PluginLog.Verbose($"[MacroPlayCommand] OnPluginReady");
-
-
+            AtemVisuals.RegisterConnectionRefresh(this.ActionImageChanged);
 
 
             //       this._atemCommandMacroPlay = new();
@@ -105,13 +106,13 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
                 if (this._currentState.Equals("ON"))// && this._blinkState 
                 {
-                    bitmapBuilder.FillRectangle(0, 0, imageSize.GetWidth(), imageSize.GetHeight(), BitmapColor.Green);
-                    bitmapBuilder.DrawText(this.GetCurrentState(this._currentState).DisplayName);
+                    AtemVisuals.FillBackground(bitmapBuilder, imageSize, BitmapColor.Green);
+                    AtemVisuals.DrawText(bitmapBuilder, this.GetCurrentState(this._currentState).DisplayName);
                 }
                 else if (this._currentState.Equals("OFF"))
                 {
-                    bitmapBuilder.FillRectangle(0, 0, imageSize.GetWidth(), imageSize.GetHeight(), BitmapColor.Black);
-                    bitmapBuilder.DrawText(this.GetCurrentState(this._currentState).DisplayName);
+                    AtemVisuals.FillBackground(bitmapBuilder, imageSize, BitmapColor.Black);
+                    AtemVisuals.DrawText(bitmapBuilder, this.GetCurrentState(this._currentState).DisplayName);
                 }
                 else
                 {

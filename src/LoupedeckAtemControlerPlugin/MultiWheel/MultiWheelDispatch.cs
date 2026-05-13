@@ -65,7 +65,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.MultiWheel
 
         public void InformInActive(IMultiWheelDispatchable dispatchable)
         {
-            if (dispatchable.GetType() == this._activeDispatcher.dispatcherType)
+            if (this._activeDispatcher != null && dispatchable.GetType() == this._activeDispatcher.dispatcherType)
             {
                 this._activeDispatcher = null;
             }

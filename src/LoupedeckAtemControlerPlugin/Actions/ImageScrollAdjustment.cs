@@ -40,6 +40,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
         {
 
             PluginLog.Verbose($"[ImageScroll] Initializing ...");
+            AtemVisuals.RegisterConnectionRefresh(this.ActionImageChanged);
 
             var stillImageData = (StillImageData)ServiceDirectory.Get(ServiceDirectory.T_StillImageData);
 
@@ -199,6 +200,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
             using (var bitmapBuilder = new BitmapBuilder(imageSize))
             {
                 bitmapBuilder.SetBackgroundImage(BitmapImage.FromFile(path));
+                AtemVisuals.ApplyOfflineOverlay(bitmapBuilder, imageSize);
                 return bitmapBuilder.ToImage();
             }
          

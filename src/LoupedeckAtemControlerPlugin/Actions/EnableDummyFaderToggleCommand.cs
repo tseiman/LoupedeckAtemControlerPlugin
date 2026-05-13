@@ -49,6 +49,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
             ((BlinkenLightsTimeSource)ServiceDirectory.Get(ServiceDirectory.T_BlinkenLightsTimeSource)).RegisterBlinkenLightReceiver(this);
             this._mwd = (MultiWheelDispatch)ServiceDirectory.Get(ServiceDirectory.T_MultiWheelDispatch);
             this._mwd.RegisterDispatchable(this, new DummAdjustment());
+            AtemVisuals.RegisterConnectionRefresh(this.ActionImageChanged);
         }
 
 
@@ -79,14 +80,14 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
                 if (this.GetCurrentState().Name.Equals("ON") && this._blinkState)
                 {
-                    bitmapBuilder.FillRectangle(0, 0, imageSize.GetWidth(), imageSize.GetHeight(), Colors.YELLOW);
+                    AtemVisuals.FillBackground(bitmapBuilder, imageSize, Colors.YELLOW);
                 }
                 else
                 {
-                    bitmapBuilder.FillRectangle(0, 0, imageSize.GetWidth(), imageSize.GetHeight(), BitmapColor.Black);
+                    AtemVisuals.FillBackground(bitmapBuilder, imageSize, BitmapColor.Black);
                 }
 
-                 bitmapBuilder.DrawText(this.GetCurrentState().DisplayName);
+                 AtemVisuals.DrawText(bitmapBuilder, this.GetCurrentState().DisplayName);
               //  bitmapBuilder.SetBackgroundImage(bitmapBuilder.ToImage());
 
                 return bitmapBuilder.ToImage();

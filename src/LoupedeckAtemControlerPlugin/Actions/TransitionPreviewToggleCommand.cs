@@ -35,6 +35,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
             this._atemCommandTogglePreview = new(this.GetToggleEvent);
 
             ((BlinkenLightsTimeSource)ServiceDirectory.Get(ServiceDirectory.T_BlinkenLightsTimeSource)).RegisterBlinkenLightReceiver(this);
+            AtemVisuals.RegisterConnectionRefresh(this.ActionImageChanged);
 
         }
 
@@ -72,14 +73,14 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
                 if (this.GetCurrentState().Name.Equals("ON") && this._blinkState)
                 {
-                    bitmapBuilder.FillRectangle(0, 0, imageSize.GetWidth(), imageSize.GetHeight(), BitmapColor.Red);
+                    AtemVisuals.FillBackground(bitmapBuilder, imageSize, BitmapColor.Red);
                 }
                 else
                 {
-                    bitmapBuilder.FillRectangle(0, 0, imageSize.GetWidth(), imageSize.GetHeight(), BitmapColor.Black);
+                    AtemVisuals.FillBackground(bitmapBuilder, imageSize, BitmapColor.Black);
                 }
 
-                bitmapBuilder.DrawText(this.GetCurrentState().DisplayName);
+                AtemVisuals.DrawText(bitmapBuilder, this.GetCurrentState().DisplayName);
 
                 return bitmapBuilder.ToImage();
             }
