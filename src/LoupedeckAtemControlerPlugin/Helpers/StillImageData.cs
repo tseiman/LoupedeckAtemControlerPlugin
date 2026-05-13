@@ -11,6 +11,12 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.Helpers
         public String ImagePath { get; set; }  = "";
         public String ActualFullImagePath { get; set; } = "";
         public String AtemURI { get; set; } = "";
+        public Int32 ActualImageIndex { get; set; } = 0;
+        public Int32 ImageCount { get; set; } = 0;
+
+        public String SelectionDisplayName => this.ImageCount > 0
+            ? $"{this.ActualImageIndex + 1}/{this.ImageCount}"
+            : "0/0";
 
 
         private readonly Plugin _plugin;

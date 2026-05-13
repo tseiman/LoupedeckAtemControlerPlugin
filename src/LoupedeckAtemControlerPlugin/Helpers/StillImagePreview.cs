@@ -13,13 +13,24 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.Helpers
             var requestedWidth = Math.Max(1, imageSize.GetWidth());
             var requestedHeight = Math.Max(1, imageSize.GetHeight());
             var aspectRatio = requestedWidth / (Double)requestedHeight;
-            var isSquareDisplay = aspectRatio > 0.85 && aspectRatio < 1.18;
-            var width = isSquareDisplay ? Math.Max(requestedWidth, 240) : requestedWidth;
-            var height = isSquareDisplay ? Math.Max(requestedHeight, 240) : requestedHeight;
             var resizeMode = aspectRatio > 0.85 && aspectRatio < 1.18
                 ? ResizeMode.Crop
                 : ResizeMode.Pad;
-            PluginLog.Verbose($"[StillImagePreview] requested {requestedWidth}x{requestedHeight}, rendering {width}x{height}, mode {resizeMode}");
+            return Load(path, requestedWidth, requestedHeight, resizeMode);
+        }
+
+        public static BitmapImage LoadScaled(String path, PluginImageSize imageSize, Double scale)
+        {
+            var requestedWidth = Math.Max(1, imageSize.GetWidth());
+            var requestedHeight = Math.Max(1, imageSize.GetHeight());
+            var width = Math.Max(requestedWidth, (Int32)Math.Round(requestedWidth * scale));
+            var height = Math.Max(requestedHeight, (Int32)Math.Round(requestedHeight * scale));
+            return Load(path, width, height, ResizeMode.Crop);
+        }
+
+        private static BitmapImage Load(String path, Int32 width, Int32 height, ResizeMode resizeMode)
+        {
+            PluginLog.Verbose($"[StillImagePreview] rendering {width}x{height}, mode {resizeMode}");
 
             using (var image = Image.Load(path))
             using (var stream = new MemoryStream())

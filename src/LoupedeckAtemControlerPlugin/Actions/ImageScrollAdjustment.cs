@@ -50,6 +50,8 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
                 {
                     this._currentIndex = Math.Clamp(this._currentIndex, 0, this._imageFiles.Length - 1);
                     stillImageData.ActualFullImagePath = this._imageFiles[this._currentIndex];
+                    this.UpdateStillImageSelection(stillImageData);
+                    StillImageChangedEvent.Raise();
                 }
                 this.RefreshAdjustmentDisplay(stillImageData.ImagePath);
             }
@@ -122,6 +124,9 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
             if (this._imageFiles.Length == 0)
             {
+                stillImageData.ActualImageIndex = 0;
+                stillImageData.ImageCount = 0;
+                StillImageChangedEvent.Raise();
                 this.RefreshAdjustmentDisplay(actionParameter);
                 return;
             }
@@ -152,6 +157,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
             if (stillImageData != null)
             {
                 stillImageData.ActualFullImagePath = this._imageFiles[this._currentIndex];
+                this.UpdateStillImageSelection(stillImageData);
 
                 // Notify SetStillImageCommand that the selected image changed so its
                 // MultiWheel / button display also redraws immediately.
@@ -262,6 +268,12 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
             // Calling without a parameter refreshes ALL currently visible instances.
             this.ActionImageChanged(parameter);
             this.ActionImageChanged();
+        }
+
+        private void UpdateStillImageSelection(StillImageData stillImageData)
+        {
+            stillImageData.ActualImageIndex = this._currentIndex;
+            stillImageData.ImageCount = this._imageFiles?.Length ?? 0;
         }
     }
 }

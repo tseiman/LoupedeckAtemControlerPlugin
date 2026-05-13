@@ -90,7 +90,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
 
         protected override String GetCommandDisplayName(String actionParameter, PluginImageSize imageSize) =>
-            $"Set Still Image";
+            this.GetStillImageDisplayText();
 
 
         protected override BitmapImage GetCommandImage(String actionParameter, PluginImageSize imageSize)
@@ -104,7 +104,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
                     try
                     {
                         PluginLog.Verbose($"[SetStillImageCommand] Rendering image preview {imageSize.GetWidth()}x{imageSize.GetHeight()} from {stillImageData.ActualFullImagePath}");
-                        bitmapBuilder.SetBackgroundImage(StillImagePreview.Load(stillImageData.ActualFullImagePath, imageSize));
+                        bitmapBuilder.SetBackgroundImage(StillImagePreview.LoadScaled(stillImageData.ActualFullImagePath, imageSize, 3.0));
                         AtemVisuals.ApplyOfflineOverlay(bitmapBuilder, imageSize);
                     }
                     catch (Exception e)
@@ -118,11 +118,18 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
                     AtemVisuals.FillBackground(bitmapBuilder, imageSize, BitmapColor.Black);
                 }
 
-                AtemVisuals.DrawText(bitmapBuilder, "Set Still\nImage");
+                AtemVisuals.DrawText(bitmapBuilder, this.GetStillImageDisplayText());
 
                 return bitmapBuilder.ToImage();
             }
         }
+
+        private String GetStillImageDisplayText()
+        {
+            var stillImageData = ServiceDirectory.Get(ServiceDirectory.T_StillImageData) as StillImageData;
+            return stillImageData != null && stillImageData.ImageCount > 0
+                ? $"Set Still\nImage {stillImageData.SelectionDisplayName}"
+                : "Set Still\nImage";
+        }
     }
 }
-
