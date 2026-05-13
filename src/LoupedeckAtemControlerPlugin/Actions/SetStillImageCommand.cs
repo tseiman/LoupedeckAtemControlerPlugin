@@ -23,6 +23,9 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
                : base(groupName: "Still Image Selection", displayName: "Set Still Image", description: "Uploads the currently selected Image to the ATEM mini")
         {
             this.IsWidget = true;
+            this.GroupName = "Still Image Selection";
+            this.DisplayName = "Set Still Image";
+            this.Description = "Uploads the currently selected Image to the ATEM mini";
             LoupedeckAtemControlerPlugin.PluginReady += this.OnPluginReady;
         }
 

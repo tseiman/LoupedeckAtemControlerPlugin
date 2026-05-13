@@ -12,6 +12,9 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.Helpers
         {
             var width = Math.Max(1, imageSize.GetWidth());
             var height = Math.Max(1, imageSize.GetHeight());
+            var resizeMode = Math.Max(width, height) > 120
+                ? ResizeMode.Crop
+                : ResizeMode.Pad;
 
             using (var image = Image.Load(path))
             using (var stream = new MemoryStream())
@@ -19,7 +22,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.Helpers
                 image.Mutate(context => context.Resize(new ResizeOptions
                 {
                     Size = new Size(width, height),
-                    Mode = ResizeMode.Pad,
+                    Mode = resizeMode,
                     PadColor = Color.Black,
                 }));
 

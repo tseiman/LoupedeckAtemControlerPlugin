@@ -14,6 +14,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
     {
         private String[] _imageFiles = Array.Empty<String>();
         private Int32 _currentIndex = 0;
+        private String _lastActionParameter = "";
    //     private String _imageFolder;
 
 
@@ -27,6 +28,9 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
         {
 
             this.IsWidget = true;
+            this.GroupName = "Still Image Selection";
+            this.DisplayName = "Still Image Select";
+            this.Description = "scrolls through the still images in the still_image folder";
 
             LoupedeckAtemControlerPlugin.PluginReady += this.OnPluginReady;
 
@@ -55,7 +59,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
                     this._currentIndex = Math.Clamp(this._currentIndex, 0, this._imageFiles.Length - 1);
                     stillImageData.ActualFullImagePath = this._imageFiles[this._currentIndex];
                 }
-                this.RefreshAdjustmentDisplay();
+                this.RefreshAdjustmentDisplay(stillImageData.ImagePath);
             }
 
 
@@ -109,6 +113,8 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
         protected override void ApplyAdjustment(String actionParameter, Int32 diff)
         {
+            this._lastActionParameter = actionParameter ?? "";
+
             if (!AtemVisuals.IsAtemConnected())
             {
                 return;
@@ -139,6 +145,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
            */
             if (this._imageFiles.Length == 0)
             {
+                this.RefreshAdjustmentDisplay(actionParameter);
                 return;
             }
 
@@ -168,13 +175,15 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
             }
 
-            this.RefreshAdjustmentDisplay();
+            this.RefreshAdjustmentDisplay(actionParameter);
 
         }
 
 
         protected override String GetAdjustmentDisplayName(String actionParameter, PluginImageSize imageSize)
         {
+            this._lastActionParameter = actionParameter ?? "";
+
             if (this._imageFiles == null || this._imageFiles.Length == 0)
             {
                 return "No Images";
@@ -197,6 +206,8 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
         protected override String GetAdjustmentValue(String actionParameter)
         {
+            this._lastActionParameter = actionParameter ?? "";
+
             return this._imageFiles.Length > 0
                 ? $"{this._currentIndex + 1}/{this._imageFiles.Length}"
                 : "0/0";
@@ -208,6 +219,8 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
         protected override BitmapImage GetAdjustmentImage(String actionParameter, PluginImageSize imageSize)
         {
+            this._lastActionParameter = actionParameter ?? "";
+
             if (this._imageFiles == null || this._imageFiles.Length == 0)
             {
                 using (var bitmapBuilder = new BitmapBuilder(imageSize))
@@ -251,10 +264,12 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
          
         }
 
-        private void RefreshAdjustmentDisplay()
+        private void RefreshAdjustmentDisplay() => this.RefreshAdjustmentDisplay(this._lastActionParameter);
+
+        private void RefreshAdjustmentDisplay(String actionParameter)
         {
             this.ActionImageChanged();
-            this.AdjustmentValueChanged("");
+            this.AdjustmentValueChanged(actionParameter ?? "");
         }
 
 
