@@ -68,7 +68,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.Helpers
                     width = Math.Max(1, (Int32)Math.Round(height * sourceAspectRatio));
                 }
 
-                PluginLog.Verbose($"[StillImagePreview] rendering original-scaled {width}x{height}, scale {scale}");
+                PluginLog.Verbose($"[StillImagePreview] requested {requestedWidth}x{requestedHeight}, rendering original-scaled {width}x{height}, scale {scale}");
                 original.Mutate(context => context.Resize(width, height));
 
                 if (!String.IsNullOrEmpty(text))

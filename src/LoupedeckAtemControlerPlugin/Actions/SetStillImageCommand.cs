@@ -15,6 +15,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
         private AtemCommandSetStillMedia _atemCommandSetStillMedia;
 
         private const UInt32 MEDIA_SLOT = 19;
+        private const Double MULTI_WHEEL_PREVIEW_SCALE = 9.0;
 
 
         public SetStillImageCommand()
@@ -106,10 +107,10 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
                         PluginLog.Verbose($"[SetStillImageCommand] Rendering image preview {imageSize.GetWidth()}x{imageSize.GetHeight()} from {stillImageData.ActualFullImagePath}");
                         if (AtemVisuals.IsAtemConnected())
                         {
-                            return StillImagePreview.LoadScaledWithText(stillImageData.ActualFullImagePath, imageSize, 3.0, this.GetStillImageDisplayText());
+                            return StillImagePreview.LoadScaledWithText(stillImageData.ActualFullImagePath, imageSize, MULTI_WHEEL_PREVIEW_SCALE, this.GetStillImageDisplayText());
                         }
 
-                        bitmapBuilder.SetBackgroundImage(StillImagePreview.LoadScaled(stillImageData.ActualFullImagePath, imageSize, 3.0));
+                        bitmapBuilder.SetBackgroundImage(StillImagePreview.LoadScaled(stillImageData.ActualFullImagePath, imageSize, MULTI_WHEEL_PREVIEW_SCALE));
                         AtemVisuals.ApplyOfflineOverlay(bitmapBuilder, imageSize);
                     }
                     catch (Exception e)
