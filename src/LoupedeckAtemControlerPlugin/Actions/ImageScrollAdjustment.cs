@@ -4,6 +4,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
 
     using System.IO;
+    using System.Reflection;
 
     using Loupedeck.LoupedeckAtemControlerPlugin.Helpers;
 
@@ -268,8 +269,40 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
         private void RefreshAdjustmentDisplay(String actionParameter)
         {
+            var parameter = actionParameter ?? "";
+
+            this.AdjustmentValueChanged(parameter);
             this.ActionImageChanged();
-            this.AdjustmentValueChanged(actionParameter ?? "");
+            this.TryInvokeSdkRefresh("ActionImageChanged", parameter);
+            this.TryInvokeSdkRefresh("AdjustmentImageChanged", parameter);
+            this.TryInvokeSdkRefresh("AdjustmentImageChanged");
+        }
+
+        private void TryInvokeSdkRefresh(String methodName, params Object[] args)
+        {
+            try
+            {
+                var argumentTypes = args.Select(arg => arg.GetType()).ToArray();
+                var type = this.GetType().BaseType;
+                MethodInfo method = null;
+
+                while (type != null && method == null)
+                {
+                    method = type.GetMethod(
+                        methodName,
+                        BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+                        null,
+                        argumentTypes,
+                        null);
+                    type = type.BaseType;
+                }
+
+                method?.Invoke(this, args);
+            }
+            catch (Exception e)
+            {
+                PluginLog.Verbose($"[ImageScroll] SDK refresh method {methodName} not available or failed: {e.Message}");
+            }
         }
 
 
