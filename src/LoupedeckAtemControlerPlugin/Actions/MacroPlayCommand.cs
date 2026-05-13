@@ -14,7 +14,6 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
         //   private LoupedeckAtemControlerPlugin _plugin => (LoupedeckAtemControlerPlugin)this.Plugin;
 
-        private String _currentState = "";
         // Initializes the command class.
         public MacroPlayCommand()
             : base(groupName: "Misc", displayName: "Run Macro", description: "Runs a macro which was predefined in the ATEM GUI")
@@ -26,9 +25,8 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
             LoupedeckAtemControlerPlugin.PluginReady += this.OnPluginReady;
 
-            this.AddState("ON", "In Macro", "Macro is Running");
             this.AddState("OFF", "Out Macro" , "Run Macro");
-            this._currentState = "OFF";
+            this.AddState("ON", "In Macro", "Macro is Running");
 
             this.MakeProfileAction("list;aaaa:");
 
@@ -78,10 +76,8 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
             //   this.ToggleCurrentState(actionParameter);
 
-            PluginLog.Verbose($"[MacroPlayCommand] >>>>> ToggleCurrentState {actionParameter}//{this.GetCurrentState(actionParameter).Name}");
-
             this.ToggleCurrentState(actionParameter);
-            this._currentState = this.GetCurrentState(actionParameter).Name;
+            PluginLog.Verbose($"[MacroPlayCommand] >>>>> ToggleCurrentState {actionParameter}//{this.GetCurrentMacroStateName(actionParameter)}");
             //   this._atemCommandTogglePreview.TogglePreview(this.GetCurrentState().Name.Equals("ON"));
 
             this.ActionImageChanged();
@@ -133,20 +129,14 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
         private String GetCurrentMacroStateName(String actionParameter)
         {
-            if (this._currentState.Equals("ON") || this._currentState.Equals("OFF"))
-            {
-                return this.GetCurrentState(this._currentState).Name;
-            }
-
             var state = this.GetCurrentState(actionParameter);
-            this._currentState = state?.Name ?? "OFF";
-            return this._currentState;
+            return state?.Name ?? "OFF";
         }
 
         private String GetCurrentMacroStateDisplayName(String actionParameter)
         {
             var stateName = this.GetCurrentMacroStateName(actionParameter);
-            return this.GetCurrentState(stateName).DisplayName;
+            return stateName.Equals("ON") ? "In Macro" : "Out Macro";
         }
         
 

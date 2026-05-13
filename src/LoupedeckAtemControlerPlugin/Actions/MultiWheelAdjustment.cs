@@ -7,6 +7,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
     public class MultiWheelAdjustment : PluginDynamicAdjustment
     {
         private MultiWheelDispatch _mwd;
+        private String _lastActionParameter = "";
 
         // private Int32 _currentFaderPos;
 
@@ -29,28 +30,33 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
         {
             PluginLog.Verbose($"[MultiWheelAdjustment] OnPluginReady");
             this._mwd = (MultiWheelDispatch)ServiceDirectory.Get(ServiceDirectory.T_MultiWheelDispatch);
-            this._mwd.DisplayChanged += this.ActionImageChanged;
-            AtemVisuals.RegisterConnectionRefresh(this.ActionImageChanged);
+            this._mwd.DisplayChanged += this.RefreshAdjustmentDisplay;
+            AtemVisuals.RegisterConnectionRefresh(this.RefreshAdjustmentDisplay);
 
         }
 
 
         protected override void ApplyAdjustment(String actionParameter, Int32 diff)
         {
+            this._lastActionParameter = actionParameter ?? "";
+
             if (!AtemVisuals.IsAtemConnected())
             {
                 return;
             }
 
             this._mwd.ApplyAdjustment(diff);
+            this.RefreshAdjustmentDisplay();
         }
 
 
         protected override String GetAdjustmentDisplayName(String actionParameter, PluginImageSize imageSize)
         {
+            this._lastActionParameter = actionParameter ?? "";
+
             if (this._mwd?.ActiveDisplay != null)
             {
-                return this._mwd.ActiveDisplay.DisplayName;
+                return "";
             }
 
             return $"{this.DisplayName}";
@@ -58,6 +64,8 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
         protected override String GetAdjustmentValue(String actionParameter)
         {
+            this._lastActionParameter = actionParameter ?? "";
+
             if (this._mwd?.ActiveDisplay != null)
             {
                 return $"{this._mwd.ActiveDisplay.DisplayPercent}%";
@@ -79,23 +87,20 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
             }
 
             var percent = Math.Clamp(activeDisplay.DisplayPercent, 0, 100);
-            var width = imageSize.GetWidth();
-            var height = imageSize.GetHeight();
-            var margin = Math.Max(6, width / 14);
-            var trackHeight = Math.Max(8, height / 8);
-            var trackY = (height / 2) - (trackHeight / 2);
-            var fillWidth = (Int32)Math.Round((width - (margin * 2)) * (percent / 100.0));
-
             using (var bitmapBuilder = new BitmapBuilder(imageSize))
             {
                 AtemVisuals.FillBackground(bitmapBuilder, imageSize, BitmapColor.Black);
-                bitmapBuilder.FillRectangle(margin, trackY, width - (margin * 2), trackHeight, new BitmapColor(0x30, 0x30, 0x30));
-                bitmapBuilder.FillRectangle(margin, trackY, fillWidth, trackHeight, Colors.YELLOW);
                 AtemVisuals.DrawText(bitmapBuilder, $"{percent}%");
 
                 return bitmapBuilder.ToImage();
             }
 
+        }
+
+        private void RefreshAdjustmentDisplay()
+        {
+            this.ActionImageChanged();
+            this.AdjustmentValueChanged(this._lastActionParameter);
         }
         
 
