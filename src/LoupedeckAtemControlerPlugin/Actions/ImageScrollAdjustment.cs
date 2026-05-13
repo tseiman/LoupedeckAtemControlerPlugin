@@ -1,7 +1,6 @@
 namespace Loupedeck.LoupedeckAtemControlerPlugin
 {
     using System.IO;
-    using System.Reflection;
 
     using Loupedeck.LoupedeckAtemControlerPlugin.Helpers;
 
@@ -249,4 +248,3 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
         }
     }
 }
-
