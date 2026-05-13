@@ -12,7 +12,8 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.Helpers
         {
             var width = Math.Max(1, imageSize.GetWidth());
             var height = Math.Max(1, imageSize.GetHeight());
-            var resizeMode = Math.Max(width, height) > 120
+            var aspectRatio = width / (Double)height;
+            var resizeMode = aspectRatio > 0.85 && aspectRatio < 1.18
                 ? ResizeMode.Crop
                 : ResizeMode.Pad;
 
