@@ -9,9 +9,12 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
     public class ImageScrollAdjustment : PluginDynamicAdjustment
     {
+        private const Int32 ScrollTicksPerImage = 3;
+
         private String[] _imageFiles = Array.Empty<String>();
         private Int32 _currentIndex = 0;
         private String _lastActionParameter = "";
+        private Int32 _scrollAccumulator = 0;
 
         private FileSystemWatcher _fsWatcher;
 
@@ -123,7 +126,16 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
                 return;
             }
 
-            this._currentIndex += diff;
+            this._scrollAccumulator += diff;
+            var imageStep = this._scrollAccumulator / ScrollTicksPerImage;
+            if (imageStep == 0)
+            {
+                this.RefreshAdjustmentDisplay(actionParameter);
+                return;
+            }
+
+            this._scrollAccumulator -= imageStep * ScrollTicksPerImage;
+            this._currentIndex += imageStep;
 
             if (this._currentIndex >= this._imageFiles.Length)
             {
@@ -212,7 +224,12 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
             {
                 try
                 {
-                    PluginLog.Verbose($"[ImageScroll] Rendering image preview {imageSize.GetWidth()}x{imageSize.GetHeight()} from {path}");
+                    PluginLog.Verbose($"[ImageScroll] Rendering image preview requested {imageSize.GetWidth()}x{imageSize.GetHeight()} from {path}");
+                    if (AtemVisuals.IsAtemConnected())
+                    {
+                        return StillImagePreview.Load(path, imageSize);
+                    }
+
                     bitmapBuilder.SetBackgroundImage(StillImagePreview.Load(path, imageSize));
                 }
                 catch (Exception e)

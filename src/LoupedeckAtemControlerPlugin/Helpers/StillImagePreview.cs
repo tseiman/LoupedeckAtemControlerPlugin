@@ -10,12 +10,16 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.Helpers
     {
         public static BitmapImage Load(String path, PluginImageSize imageSize)
         {
-            var width = Math.Max(1, imageSize.GetWidth());
-            var height = Math.Max(1, imageSize.GetHeight());
-            var aspectRatio = width / (Double)height;
+            var requestedWidth = Math.Max(1, imageSize.GetWidth());
+            var requestedHeight = Math.Max(1, imageSize.GetHeight());
+            var aspectRatio = requestedWidth / (Double)requestedHeight;
+            var isSquareDisplay = aspectRatio > 0.85 && aspectRatio < 1.18;
+            var width = isSquareDisplay ? Math.Max(requestedWidth, 240) : requestedWidth;
+            var height = isSquareDisplay ? Math.Max(requestedHeight, 240) : requestedHeight;
             var resizeMode = aspectRatio > 0.85 && aspectRatio < 1.18
                 ? ResizeMode.Crop
                 : ResizeMode.Pad;
+            PluginLog.Verbose($"[StillImagePreview] requested {requestedWidth}x{requestedHeight}, rendering {width}x{height}, mode {resizeMode}");
 
             using (var image = Image.Load(path))
             using (var stream = new MemoryStream())
