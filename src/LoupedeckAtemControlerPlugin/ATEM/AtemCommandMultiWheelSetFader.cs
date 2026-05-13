@@ -31,14 +31,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.ATEM
             PluginLog.Verbose($"[AtemCommandSetFader] received command {command.GetType().Name}");
 
             var tmpCmd = (TransitionPositionGetCommand)command;
-            var reportedPosition = ClampHandlePosition(tmpCmd.HandlePosition);
-
-            if (!tmpCmd.InTransition && reportedPosition <= EndSnapDistance && this._transitionPos >= MaxHandlePosition - EndSnapDistance)
-            {
-                reportedPosition = MaxHandlePosition;
-            }
-
-            this._transitionPos = SnapEndpoint(reportedPosition);
+            this._transitionPos = SnapEndpoint(ClampHandlePosition(tmpCmd.HandlePosition));
             this._inTransition = tmpCmd.InTransition;
 
             PluginLog.Verbose($"[AtemCommandSetFader] updated Fader Pos {this._transitionPos}, in trans: {tmpCmd.InTransition}, rem frms: {tmpCmd.RemainingFrames}");
@@ -53,7 +46,13 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.ATEM
 
             PluginLog.Verbose($"[AtemCommandSetFader] applyAdjustment {diff}");
 
-            var nextPos = SnapEndpoint(ClampHandlePosition(this._transitionPos + (diff * WheelStep)));
+            var step = diff * WheelStep;
+            if (!this._inTransition && this._transitionPos <= MinHandlePosition + EndSnapDistance)
+            {
+                step = Math.Abs(diff) * WheelStep;
+            }
+
+            var nextPos = SnapEndpoint(ClampHandlePosition(this._transitionPos + step));
             if (PositionsEqual(nextPos, this._transitionPos))
             {
                 return;

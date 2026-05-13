@@ -57,6 +57,11 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
         // This method is called when the user executes the command.
         protected override void RunCommand(String actionParameter)
         {
+            if (!AtemVisuals.IsAtemConnected())
+            {
+                return;
+            }
+
             PluginLog.Verbose($"[EnableMixFaderToggleCommand] ToggleCurrentState {this.GetCurrentState().Name}");
             this.ToggleCurrentState();
             if (this.GetCurrentState().Name.Equals("ON"))

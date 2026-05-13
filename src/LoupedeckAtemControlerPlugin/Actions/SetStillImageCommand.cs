@@ -54,6 +54,11 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
         // This method is called when the user executes the command.
         protected override void RunCommand(String actionParameter)
         {
+            if (!AtemVisuals.IsAtemConnected())
+            {
+                return;
+            }
+
             var stillImageData = (StillImageData)ServiceDirectory.Get(ServiceDirectory.T_StillImageData);
 
             if (stillImageData != null)

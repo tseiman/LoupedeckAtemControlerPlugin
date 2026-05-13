@@ -35,6 +35,11 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
         protected override void ApplyAdjustment(String actionParameter, Int32 diff)
         {
+            if (!AtemVisuals.IsAtemConnected())
+            {
+                return;
+            }
+
             this._mwd.ApplyAdjustment(diff);
         }
 

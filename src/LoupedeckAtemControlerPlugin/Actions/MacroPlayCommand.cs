@@ -71,6 +71,10 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
         // This method is called when the user executes the command.
         protected override void RunCommand(String actionParameter)
         {
+            if (!AtemVisuals.IsAtemConnected())
+            {
+                return;
+            }
 
 
             //   this.ToggleCurrentState(actionParameter);

@@ -105,6 +105,11 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
         protected override void ApplyAdjustment(String actionParameter, Int32 diff)
         {
+            if (!AtemVisuals.IsAtemConnected())
+            {
+                return;
+            }
+
             //    PluginLog.Verbose($"[ImageScroll] >>>>>>>>> PLUGIn Settings {String.Join(", ", this._plugin.ListPluginSettings())}");
 
             var stillImageData = (StillImageData)ServiceDirectory.Get(ServiceDirectory.T_StillImageData);
