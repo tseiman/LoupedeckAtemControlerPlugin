@@ -1,8 +1,5 @@
-
 namespace Loupedeck.LoupedeckAtemControlerPlugin
 {
-
-
     using System.IO;
     using System.Reflection;
 
@@ -16,18 +13,14 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
         private String[] _imageFiles = Array.Empty<String>();
         private Int32 _currentIndex = 0;
         private String _lastActionParameter = "";
-   //     private String _imageFolder;
-
 
         private FileSystemWatcher _fsWatcher;
-
 
         private LoupedeckAtemControlerPlugin _plugin => (LoupedeckAtemControlerPlugin)this.Plugin;
 
         public ImageScrollAdjustment()
                : base(groupName: "Still Image Selection", displayName: "Still Image Select", description: "scrolls through the still images in the still_image folder", hasReset: false)
         {
-
             this.IsWidget = true;
             this.GroupName = "Still Image Selection";
             this.DisplayName = "Still Image Select";
@@ -39,11 +32,8 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
         }
 
 
-
-
         private void OnPluginReady()
         {
-
             PluginLog.Verbose($"[ImageScroll] Initializing ...");
             AtemVisuals.RegisterConnectionRefresh(this.RefreshAdjustmentDisplay);
 
@@ -51,7 +41,6 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
             if (!stillImageData.ImagePath.Equals(""))
             {
-
                 this.SetupFsWatcher();
                 this.OnChanged(null, null);
                 PluginLog.Verbose($"[ImageScroll] Loading images from stored config path {stillImageData.ImagePath}");
@@ -62,25 +51,21 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
                 }
                 this.RefreshAdjustmentDisplay(stillImageData.ImagePath);
             }
-
-
-
         }
-
 
 
         private void OnChanged(Object source, FileSystemEventArgs e)
         {
             var stillImageData = (StillImageData)ServiceDirectory.Get(ServiceDirectory.T_StillImageData);
-            this._imageFiles = Directory.GetFiles(stillImageData.ImagePath, "*.jpg").Union(Directory.GetFiles(stillImageData.ImagePath, "*.jpeg")).ToArray();
+            this._imageFiles = Directory.GetFiles(stillImageData.ImagePath, "*.jpg")
+                                        .Union(Directory.GetFiles(stillImageData.ImagePath, "*.jpeg"))
+                                        .ToArray();
             PluginLog.Verbose($"[ImageScroll] Found {this._imageFiles.Length} images in {stillImageData.ImagePath}");
-
         }
 
 
         private void SetupFsWatcher()
         {
-
             PluginLog.Verbose($"[ImageScroll] Setting up new FSWatcher s {String.Join(", ", this._plugin.ListPluginSettings())}");
             var stillImageData = (StillImageData)ServiceDirectory.Get(ServiceDirectory.T_StillImageData);
 
@@ -107,9 +92,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
 
             this._fsWatcher.IncludeSubdirectories = true;
             this._fsWatcher.EnableRaisingEvents = true;
-
         }
-
 
 
         protected override void ApplyAdjustment(String actionParameter, Int32 diff)
@@ -121,50 +104,37 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
                 return;
             }
 
-            //    PluginLog.Verbose($"[ImageScroll] >>>>>>>>> PLUGIn Settings {String.Join(", ", this._plugin.ListPluginSettings())}");
-
             var stillImageData = (StillImageData)ServiceDirectory.Get(ServiceDirectory.T_StillImageData);
 
             if (!stillImageData.ImagePath.Equals(actionParameter) || this._imageFiles == null || this._imageFiles.Length == 0)
             {
-
-                PluginLog.Verbose($"[ImageScroll]  ImagePath not equal actionParam setting with with {actionParameter}");
+                PluginLog.Verbose($"[ImageScroll]  ImagePath not equal actionParam setting with {actionParameter}");
 
                 this._fsWatcher?.Dispose();
-                                
+
                 stillImageData.ImagePath = actionParameter;
                 this.SetupFsWatcher();
                 this.OnChanged(null, null);
                 stillImageData.Save();
             }
-           /* else
-            {
-                PluginLog.Info($"[ImageScroll]  overwrite ImagePath  with {actionParameter}");
-                this._plugin.stillImageData.ImagePath = actionParameter;
-                this._plugin.stillImageData.Save();
-            }
-           */
+
             if (this._imageFiles.Length == 0)
             {
                 this.RefreshAdjustmentDisplay(actionParameter);
                 return;
             }
 
-
             this._currentIndex += diff;
-
 
             if (this._currentIndex >= this._imageFiles.Length)
             {
                 this._currentIndex = this._imageFiles.Length - 1;
             }
 
-
             if (this._currentIndex < 0)
             {
                 this._currentIndex = 0;
             }
-
 
             PluginLog.Verbose($"[ImageScroll] ApplyAdjustment → index: {this._currentIndex}, actionParam: {actionParameter}");
 
@@ -172,12 +142,12 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
             {
                 stillImageData.ActualFullImagePath = this._imageFiles[this._currentIndex];
 
-        //        this._plugin.stillImageData.ImagePath = actionParameter;
-
+                // Notify SetStillImageCommand that the selected image changed so its
+                // MultiWheel / button display also redraws immediately.
+                StillImageChangedEvent.Raise();
             }
 
             this.RefreshAdjustmentDisplay(actionParameter);
-
         }
 
 
@@ -190,7 +160,6 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
                 return "No Images";
             }
 
-
             var path = this._imageFiles[this._currentIndex];
 
             if (!File.Exists(path))
@@ -199,11 +168,9 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
                 return "Img not Found";
             }
 
-
-            return this._imageFiles.Length > 0
-                ? Path.GetFileName(this._imageFiles[this._currentIndex])
-                : "No Images";
+            return Path.GetFileName(this._imageFiles[this._currentIndex]);
         }
+
 
         protected override String GetAdjustmentValue(String actionParameter)
         {
@@ -213,9 +180,6 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
                 ? $"{this._currentIndex + 1}/{this._imageFiles.Length}"
                 : "0/0";
         }
-
-
-
 
 
         protected override BitmapImage GetAdjustmentImage(String actionParameter, PluginImageSize imageSize)
@@ -262,52 +226,27 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
                 AtemVisuals.ApplyOfflineOverlay(bitmapBuilder, imageSize);
                 return bitmapBuilder.ToImage();
             }
-         
         }
 
+
+        // Parameterless overload used by AtemVisuals connection-refresh callback.
         private void RefreshAdjustmentDisplay() => this.RefreshAdjustmentDisplay(this._lastActionParameter);
 
         private void RefreshAdjustmentDisplay(String actionParameter)
         {
             var parameter = actionParameter ?? "";
 
+            // AdjustmentValueChanged(parameter) tells the Plugin Service that the
+            // value text (shown on dial strips) has changed for this specific parameter.
             this.AdjustmentValueChanged(parameter);
+
+            // ActionImageChanged(parameter) is the key call for the MultiWheel central
+            // display: it tells the Plugin Service to re-call GetAdjustmentImage() for
+            // this parameter and push the new bitmap to the wheel screen.
+            // Calling without a parameter refreshes ALL currently visible instances.
+            this.ActionImageChanged(parameter);
             this.ActionImageChanged();
-            this.TryInvokeSdkRefresh("ActionImageChanged", parameter);
-            this.TryInvokeSdkRefresh("AdjustmentImageChanged", parameter);
-            this.TryInvokeSdkRefresh("AdjustmentImageChanged");
         }
-
-        private void TryInvokeSdkRefresh(String methodName, params Object[] args)
-        {
-            try
-            {
-                var argumentTypes = args.Select(arg => arg.GetType()).ToArray();
-                var type = this.GetType().BaseType;
-                MethodInfo method = null;
-
-                while (type != null && method == null)
-                {
-                    method = type.GetMethod(
-                        methodName,
-                        BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-                        null,
-                        argumentTypes,
-                        null);
-                    type = type.BaseType;
-                }
-
-                method?.Invoke(this, args);
-            }
-            catch (Exception e)
-            {
-                PluginLog.Verbose($"[ImageScroll] SDK refresh method {methodName} not available or failed: {e.Message}");
-            }
-        }
-
-
-
     }
-
-
 }
+
