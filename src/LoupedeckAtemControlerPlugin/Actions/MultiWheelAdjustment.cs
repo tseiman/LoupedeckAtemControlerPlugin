@@ -80,6 +80,8 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin
         
         protected override BitmapImage GetAdjustmentImage(String actionParameter, PluginImageSize imageSize)
         {
+            PluginLog.Verbose($"[MultiWheelAdjustment] GetAdjustmentImage imageSize={imageSize.GetWidth()}x{imageSize.GetHeight()} actionParameter='{actionParameter ?? "<null>"}'");
+
             var activeDisplay = this._mwd?.ActiveDisplay;
             if (activeDisplay == null)
             {
