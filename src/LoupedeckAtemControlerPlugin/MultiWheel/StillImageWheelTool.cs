@@ -71,10 +71,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.MultiWheel
         {
             try
             {
-                if (this.CanDraw())
-                {
-                    this.Draw();
-                }
+                this.Draw();
             }
             catch (Exception e)
             {
