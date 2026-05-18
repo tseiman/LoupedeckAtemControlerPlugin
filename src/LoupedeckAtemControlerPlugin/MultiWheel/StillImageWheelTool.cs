@@ -19,7 +19,7 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.MultiWheel
 
         protected override void OnInit()
         {
-            PluginLog.Verbose($"[StillImageWheelTool] OnInit");
+            PluginLog.Verbose($"[StillImageWheelTool] OnInit TemplateName='{this.TemplateName}' DisplayName='{this.TemplateDisplayName}' GroupName='{this.TemplateGroupName}'");
             base.OnInit();
         }
 
