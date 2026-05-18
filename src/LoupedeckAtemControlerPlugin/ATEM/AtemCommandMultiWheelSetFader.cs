@@ -78,7 +78,10 @@ namespace Loupedeck.LoupedeckAtemControlerPlugin.ATEM
                 step = diff * this._activeWheelDirection * WheelStep;
             }
 
-            var nextPos = SnapEndpoint(ClampHandlePosition(this._transitionPos + step));
+            // Do NOT SnapEndpoint here: WheelStep (0.0125) < EndSnapDistance (0.02) means
+            // a single tick from MinHandlePosition would snap back to 0 and the fader would
+            // never escape. ClampHandlePosition is enough — endpoints are reached naturally.
+            var nextPos = ClampHandlePosition(this._transitionPos + step);
             if (PositionsEqual(nextPos, this._transitionPos))
             {
                 return;
